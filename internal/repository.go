@@ -3,12 +3,12 @@ package internal
 import "ardafirdausr/posjoo-server/internal/entity"
 
 type UserRepository interface {
-	GetUserByID(ID int64) (*entity.User, error)
+	GetUserByID(userID int64) (*entity.User, error)
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUsersByMerchantID(merchantID int64) ([]*entity.User, error)
 	CreateUser(param entity.CreateUserParam) (*entity.User, error)
-	UpdateByID(ID int64, param entity.UpdateUserParam) error
-	DeleteUserByID(ID int64) error
+	UpdateByID(userID int64, param entity.UpdateUserParam) error
+	DeleteUserByID(userID int64) error
 }
 
 type MerchantRepository interface {
@@ -18,7 +18,7 @@ type MerchantRepository interface {
 type ProductRepository interface {
 	GetProductByID(productID int64) (*entity.Product, error)
 	GetProductsByMerchantID(merchantID int64) ([]*entity.Product, error)
-	CreteProduct(param entity.CreateProductParam) (*entity.Product, error)
+	CreateProduct(param entity.CreateProductParam) (*entity.Product, error)
 	UpdateProductByID(productId int64, param entity.UpdatedProductparam) error
 	DeleteProductByID(productId int64) error
 }

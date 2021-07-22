@@ -24,22 +24,24 @@ type User struct {
 }
 
 type CreateUserParam struct {
-	Name                 string   `json:"name" validate:"required"`
-	Email                string   `json:"email" validate:"required,email"`
-	Role                 UserRole `json:"role" validate:"required"`
-	Position             string   `json:"position" validate:"required"`
-	Password             string   `json:"password" validate:"required"`
-	PasswordConfirmation string   `json:"password_confirmation" validate:"required,eqfield=Password"`
-	MerchantID           int64    `json:"-"`
+	Name                 string    `json:"name" validate:"required"`
+	Email                string    `json:"email" validate:"required,email"`
+	Role                 UserRole  `json:"role" validate:"required"`
+	Position             string    `json:"position" validate:"required"`
+	Password             string    `json:"password" validate:"required"`
+	PasswordConfirmation string    `json:"password_confirmation" validate:"required,eqfield=Password"`
+	MerchantID           int64     `json:"-"`
+	CreatedAt            time.Time `json:"-"`
 }
 
 type UpdateUserParam struct {
-	Name                 string   `json:"name" validate:"required"`
-	Email                string   `json:"email" validate:"required,email"`
-	Role                 UserRole `json:"role" validate:"required"`
-	Position             string   `json:"position" validate:"required"`
-	Password             string   `json:"password" validate:"required"`
-	PasswordConfirmation string   `json:"password_confirmation" validate:"required,eqfield=Password"`
+	Name                 string    `json:"name" validate:"required"`
+	Email                string    `json:"email" validate:"required,email"`
+	Role                 UserRole  `json:"role" validate:"required"`
+	Position             string    `json:"position" validate:"required"`
+	Password             string    `json:"password" validate:"required"`
+	PasswordConfirmation string    `json:"password_confirmation" validate:"required,eqfield=Password"`
+	UpdatedAt            time.Time `json:"-"`
 }
 
 type UpdateUserPhotoParam struct {

@@ -19,9 +19,9 @@ func NewUserRepository(DB *sql.DB) *UserRepository {
 	return repo
 }
 
-func (repo *UserRepository) GetUserByID(ID int64) (*entity.User, error) {
+func (repo *UserRepository) GetUserByID(userID int64) (*entity.User, error) {
 	ctx := context.TODO()
-	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM users WHERE id = ?", ID)
+	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM users WHERE id = ?", userID)
 
 	var user entity.User
 	var err = row.Scan(
@@ -123,14 +123,18 @@ func (repo *UserRepository) GetUsersByMerchantID(merchantID int64) ([]*entity.Us
 }
 
 func (repo *UserRepository) CreateUser(param entity.CreateUserParam) (*entity.User, error) {
-	res, err := repo.DB.Exec(
-		"INSERT INTO users(name, email, role, password, merchant_id) VALUES(?, ?, ?, ?, ?)",
+	ctx := context.TODO()
+	res, err := repo.DB.ExecContext(
+		ctx,
+		"INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		param.Name,
 		param.Email,
 		param.Role,
 		param.Position,
 		param.Password,
-		param.MerchantID)
+		param.MerchantID,
+		param.CreatedAt,
+		param.CreatedAt)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -157,17 +161,19 @@ func (repo *UserRepository) CreateUser(param entity.CreateUserParam) (*entity.Us
 	return user, nil
 }
 
-func (repo *UserRepository) UpdateByID(ID int64, param entity.UpdateUserParam) error {
-	res, err := repo.DB.Exec(
-		"UPDATE users SET name = ?, email = ?, role = ?, position = ?, password = ? WHERE id = ?",
-		param.Name, param.Email, param.Role, param.Position, param.Password, ID)
+func (repo *UserRepository) UpdateByID(userID int64, param entity.UpdateUserParam) error {
+	ctx := context.TODO()
+	res, err := repo.DB.ExecContext(
+		ctx,
+		"UPDATE users SET name = ?, email = ?, role = ?, position = ?, password = ?, updated_at = ? WHERE id = ?",
+		param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
 
 	if num, _ := res.RowsAffected(); num < 1 {
-		err := errors.New("failed update user")
+		err := errors.New("failed to update user")
 		enf := entity.ErrNotFound{
 			Message: "User not found",
 			Err:     err,
@@ -179,17 +185,22 @@ func (repo *UserRepository) UpdateByID(ID int64, param entity.UpdateUserParam) e
 	return nil
 }
 
-func (repo *UserRepository) DeleteUserByID(ID int64) error {
-	res, err := repo.DB.Exec("DELETE FROM users WHERE id = ?", ID)
+func (repo *UserRepository) DeleteUserByID(userID int64) error {
+	ctx := context.TODO()
+	res, err := repo.DB.ExecContext(ctx, "DELETE FROM users WHERE id = ?", userID)
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
 
 	if num, _ := res.RowsAffected(); num < 1 {
-		err := errors.New("failed update user")
-		log.Println(err.Error())
-		return err
+		err := errors.New("failed to delete user")
+		enf := entity.ErrNotFound{
+			Message: "User not found",
+			Err:     err,
+		}
+		log.Println(enf.Error())
+		return enf
 	}
 
 	return nil
