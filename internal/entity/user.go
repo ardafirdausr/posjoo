@@ -24,14 +24,13 @@ type User struct {
 }
 
 type CreateUserParam struct {
-	Name                 string    `json:"name" validate:"required"`
-	Email                string    `json:"email" validate:"required,email"`
-	Role                 UserRole  `json:"role" validate:"required"`
-	Position             string    `json:"position" validate:"required"`
-	Password             string    `json:"password" validate:"required"`
-	PasswordConfirmation string    `json:"password_confirmation" validate:"required,eqfield=Password"`
-	MerchantID           int64     `json:"-"`
-	CreatedAt            time.Time `json:"-"`
+	Name                 string   `json:"name" validate:"required"`
+	Email                string   `json:"email" validate:"required,email"`
+	Role                 UserRole `json:"role" validate:"required"`
+	Position             string   `json:"position" validate:"required"`
+	Password             string   `json:"password" validate:"required"`
+	PasswordConfirmation string   `json:"password_confirmation" validate:"required,eqfield=Password"`
+	MerchantID           int64    `json:"-"`
 }
 
 type UpdateUserParam struct {

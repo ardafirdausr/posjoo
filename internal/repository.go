@@ -6,7 +6,7 @@ type UserRepository interface {
 	GetUserByID(ID int64) (*entity.User, error)
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUsersByMerchantID(merchantID int64) ([]*entity.User, error)
-	CreateUser(param entity.CreateUserParam) (*entity.Product, error)
+	CreateUser(param entity.CreateUserParam) (*entity.User, error)
 	UpdateByID(ID int64, param entity.UpdateUserParam) error
 	DeleteUserByID(ID int64) error
 }
