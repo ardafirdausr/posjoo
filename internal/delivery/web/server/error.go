@@ -43,6 +43,11 @@ func (che CustomHTTPErrorHandler) Handler(err error, c echo.Context) {
 		he.Message = ent.Message
 	}
 
+	if ent, ok := err.(entity.ErrForbidden); ok {
+		he.Code = http.StatusForbidden
+		he.Message = ent.Message
+	}
+
 	if ent, ok := err.(entity.ErrNotFound); ok {
 		he.Code = http.StatusNotFound
 		he.Message = ent.Message

@@ -30,6 +30,21 @@ func (eu ErrUnauthorize) Error() string {
 	}
 }
 
+type ErrForbidden struct {
+	Message string
+	Err     error
+}
+
+func (ef ErrForbidden) Error() string {
+	if ef.Err != nil {
+		return ef.Err.Error()
+	} else if ef.Message != "" {
+		return ef.Message
+	} else {
+		return "Forbidden"
+	}
+}
+
 type ErrNotFound struct {
 	Message string
 	Err     error

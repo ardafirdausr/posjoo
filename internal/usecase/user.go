@@ -86,6 +86,16 @@ func (uc UserUsecase) UpdateUser(ctx context.Context, userID int64, param entity
 		return nil, err
 	}
 
+	ownerTriedToChangeRole := user.Role == entity.UserRoleOwner && param.Role != entity.UserRoleOwner
+	ownerTriedToMakeOtherOwner := user.Role != entity.UserRoleOwner && param.Role == entity.UserRoleOwner
+	if ownerTriedToChangeRole && ownerTriedToMakeOtherOwner {
+		err := entity.ErrForbidden{
+			Message: "Cannot change owner or create new orner",
+			Err:     errors.New("cannot change owner or create new orner"),
+		}
+		return nil, err
+	}
+
 	param.UpdatedAt = time.Now()
 	if err = uc.userRepo.UpdateByID(ctx, userID, param); err != nil {
 		log.Println(err.Error())

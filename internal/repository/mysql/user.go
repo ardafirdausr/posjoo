@@ -143,7 +143,7 @@ func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID
 }
 
 func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error) {
-	var query = "INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+	var query = "INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?)"
 	var res sql.Result
 	var err error
 	txKey := transactionContextKey("tx")
