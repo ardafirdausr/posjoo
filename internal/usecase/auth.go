@@ -40,7 +40,6 @@ func (uc AuthUsecase) Register(ctx context.Context, param entity.RegisterParam) 
 	}
 
 	txCtx := uc.unitOfWork.Begin(ctx)
-
 	createMerchantParam := entity.CreateMerchantParam{
 		Name:      param.BusinessName,
 		Address:   param.BusinessAddress,

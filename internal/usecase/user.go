@@ -47,7 +47,7 @@ func (uc UserUsecase) CreateUser(ctx context.Context, param entity.CreateUserPar
 		return nil, err
 	}
 
-	if existUser.Email == param.Email {
+	if existUser != nil && existUser.Email == param.Email {
 		err := entity.ErrInvalidData{
 			Message: "Email is already registered",
 			Err:     errors.New("email is already registered"),

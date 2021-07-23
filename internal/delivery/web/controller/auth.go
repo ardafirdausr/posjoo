@@ -22,7 +22,8 @@ func NewAuthController(ucs *app.Usecases) *AuthController {
 func (ctrl AuthController) Register(c echo.Context) error {
 	var param entity.RegisterParam
 	if err := c.Bind(&param); err != nil {
-		return echo.ErrInternalServerError
+		log.Println(err.Error())
+		return err
 	}
 
 	if err := c.Validate(&param); err != nil {
@@ -57,7 +58,7 @@ func (ctrl AuthController) Login(c echo.Context) error {
 	var param entity.LoginParam
 	if err := c.Bind(&param); err != nil {
 		log.Println(err.Error())
-		return echo.ErrInternalServerError
+		return err
 	}
 
 	if err := c.Validate(&param); err != nil {

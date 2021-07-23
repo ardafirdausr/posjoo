@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -97,6 +98,7 @@ func (repo *UserRepository) GetUserByEmail(ctx context.Context, email string) (*
 }
 
 func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID int64) ([]*entity.User, error) {
+	fmt.Println(merchantID)
 	var query = "SELECT * FROM users WHERE merchant_id = ?"
 	var rows *sql.Rows
 	var err error
@@ -111,7 +113,7 @@ func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID
 		log.Println(err.Error())
 		return nil, err
 	}
-	rows.Close()
+	defer rows.Close()
 
 	users := []*entity.User{}
 	for rows.Next() {

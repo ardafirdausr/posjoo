@@ -104,7 +104,7 @@ func (repo ProductRepository) GetProductsByMerchantID(ctx context.Context, merch
 		log.Println(err.Error())
 		return nil, err
 	}
-	rows.Close()
+	defer rows.Close()
 
 	products := []*entity.Product{}
 	for rows.Next() {
