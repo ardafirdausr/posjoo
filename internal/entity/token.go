@@ -8,7 +8,6 @@ type TokenPayload struct {
 	Email      string   `json:"email"`
 	PhotoUrl   *string  `json:"photo_url"`
 	Role       UserRole `json:"role"`
-	Position   string   `json:"position"`
 	MerchantID int64    `json:"merchant_id"`
 }
 

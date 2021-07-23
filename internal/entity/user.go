@@ -16,7 +16,6 @@ type User struct {
 	Email      string    `json:"email"`
 	PhotoUrl   *string   `json:"photo_url"`
 	Role       UserRole  `json:"role"`
-	Position   string    `json:"position"`
 	Password   string    `json:"-"`
 	MerchantID int64     `json:"merchant_id"`
 	CreatedAt  time.Time `json:"created_at"`
@@ -41,7 +40,6 @@ type CreateUserParam struct {
 	Name                 string    `json:"name" validate:"required"`
 	Email                string    `json:"email" validate:"required,email"`
 	Role                 UserRole  `json:"role" validate:"required"`
-	Position             string    `json:"position" validate:"required"`
 	Password             string    `json:"password" validate:"required"`
 	PasswordConfirmation string    `json:"password_confirmation" validate:"required,eqfield=Password"`
 	MerchantID           int64     `json:"-" validate:"required"`
@@ -52,7 +50,6 @@ type UpdateUserParam struct {
 	Name      string    `json:"name" validate:"required"`
 	Email     string    `json:"email" validate:"required,email"`
 	Role      UserRole  `json:"role" validate:"required"`
-	Position  string    `json:"position" validate:"required"`
 	UpdatedAt time.Time `json:"-"`
 }
 

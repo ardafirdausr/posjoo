@@ -57,7 +57,6 @@ func (uc AuthUsecase) Register(ctx context.Context, param entity.RegisterParam) 
 		Name:       param.Name,
 		Email:      param.Email,
 		Role:       entity.UserRoleOwner,
-		Position:   "Owner",
 		Password:   hashString(param.Password),
 		MerchantID: merchant.ID,
 		CreatedAt:  time.Now(),
@@ -123,7 +122,6 @@ func (uc AuthUsecase) GenerateAuthToken(ctx context.Context, user entity.User, t
 	tokenPayload.Name = user.Name
 	tokenPayload.Email = user.Email
 	tokenPayload.Role = user.Role
-	tokenPayload.Position = user.Position
 	tokenPayload.MerchantID = user.MerchantID
 	tokenPayload.PhotoUrl = user.PhotoUrl
 	token, err := tokenizer.Generate(tokenPayload)

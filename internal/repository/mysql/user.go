@@ -38,7 +38,6 @@ func (repo *UserRepository) GetUserByID(ctx context.Context, userID int64) (*ent
 		&user.Email,
 		&user.PhotoUrl,
 		&user.Role,
-		&user.Position,
 		&user.Password,
 		&user.MerchantID,
 		&user.CreatedAt,
@@ -76,7 +75,6 @@ func (repo *UserRepository) GetUserByEmail(ctx context.Context, email string) (*
 		&user.Email,
 		&user.PhotoUrl,
 		&user.Role,
-		&user.Position,
 		&user.Password,
 		&user.MerchantID,
 		&user.CreatedAt,
@@ -124,7 +122,6 @@ func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID
 			&user.Email,
 			&user.PhotoUrl,
 			&user.Role,
-			&user.Position,
 			&user.Password,
 			&user.MerchantID,
 			&user.CreatedAt,
@@ -146,14 +143,14 @@ func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID
 }
 
 func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error) {
-	var query = "INSERT INTO users(name, email, role, position, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+	var query = "INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
 	var res sql.Result
 	var err error
 	txKey := transactionContextKey("tx")
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
+		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
 	} else {
-		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
 	}
 
 	if err != nil {
@@ -172,7 +169,6 @@ func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateU
 		Name:       param.Name,
 		Email:      param.Email,
 		Role:       param.Role,
-		Position:   param.Position,
 		Password:   param.Password,
 		MerchantID: param.MerchantID,
 		CreatedAt:  time.Now(),
@@ -183,14 +179,14 @@ func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateU
 }
 
 func (repo *UserRepository) UpdateByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error {
-	var query = "UPDATE users SET name = ?, email = ?, role = ?, position = ?, updated_at = ? WHERE id = ?"
+	var query = "UPDATE users SET name = ?, email = ?, role = ?, updated_at = ? WHERE id = ?"
 	var res sql.Result
 	var err error
 	txKey := transactionContextKey("tx")
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.UpdatedAt, userID)
+		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.UpdatedAt, userID)
 	} else {
-		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.UpdatedAt, userID)
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.UpdatedAt, userID)
 	}
 
 	if err != nil {
