@@ -12,7 +12,7 @@ type drivers struct {
 }
 
 func newDrivers() (*drivers, error) {
-	drivers := &drivers{}
+	drivers := new(drivers)
 
 	MySQLURI := os.Getenv("MYSQL_URI")
 	MySQLDB, err := driver.ConnectToMySQLDB(MySQLURI)

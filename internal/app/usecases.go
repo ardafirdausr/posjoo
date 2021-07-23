@@ -12,12 +12,9 @@ type Usecases struct {
 }
 
 func newUsecases(repos *repositories) *Usecases {
-	authUsecase := usecase.NewAuthUsecase(repos.userRepo)
-	userUsecase := usecase.NewUserUsecase(repos.userRepo)
-	productUsecase := usecase.NewProductUsecase(repos.productRepo)
-	return &Usecases{
-		AuthUsecase:    authUsecase,
-		UserUsecase:    userUsecase,
-		ProductUsecase: productUsecase,
-	}
+	usecases := new(Usecases)
+	usecases.AuthUsecase = usecase.NewAuthUsecase(repos.userRepo, repos.merchantRepo, repos.unitOfWork)
+	usecases.UserUsecase = usecase.NewUserUsecase(repos.userRepo)
+	usecases.ProductUsecase = usecase.NewProductUsecase(repos.productRepo)
+	return usecases
 }

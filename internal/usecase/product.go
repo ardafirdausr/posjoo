@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -18,8 +19,8 @@ func NewProductUsecase(ProductRepo internal.ProductRepository) *ProductUsecase {
 	return usecase
 }
 
-func (uc ProductUsecase) GetMerchantProducts(merchantID int64) ([]*entity.Product, error) {
-	products, err := uc.ProductRepo.GetProductsByMerchantID(merchantID)
+func (uc ProductUsecase) GetMerchantProducts(ctx context.Context, merchantID int64) ([]*entity.Product, error) {
+	products, err := uc.ProductRepo.GetProductsByMerchantID(ctx, merchantID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -28,8 +29,8 @@ func (uc ProductUsecase) GetMerchantProducts(merchantID int64) ([]*entity.Produc
 	return products, err
 }
 
-func (uc ProductUsecase) GetProduct(productID int64) (*entity.Product, error) {
-	product, err := uc.ProductRepo.GetProductByID(productID)
+func (uc ProductUsecase) GetProduct(ctx context.Context, productID int64) (*entity.Product, error) {
+	product, err := uc.ProductRepo.GetProductByID(ctx, productID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -38,8 +39,8 @@ func (uc ProductUsecase) GetProduct(productID int64) (*entity.Product, error) {
 	return product, err
 }
 
-func (uc ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entity.Product, error) {
-	existProduct, err := uc.ProductRepo.GetProductBySKU(param.SKU)
+func (uc ProductUsecase) CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error) {
+	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
 		return nil, err
@@ -53,7 +54,7 @@ func (uc ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entity
 		return nil, err
 	}
 
-	Product, err := uc.ProductRepo.CreateProduct(param)
+	Product, err := uc.ProductRepo.CreateProduct(ctx, param)
 	if err != nil {
 		return nil, err
 	}
@@ -61,14 +62,14 @@ func (uc ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entity
 	return Product, nil
 }
 
-func (uc ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedProductparam) (*entity.Product, error) {
-	Product, err := uc.ProductRepo.GetProductByID(productID)
+func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, param entity.UpdatedProductparam) (*entity.Product, error) {
+	Product, err := uc.ProductRepo.GetProductByID(ctx, productID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	existProduct, err := uc.ProductRepo.GetProductBySKU(param.SKU)
+	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
 		return nil, err
@@ -82,7 +83,7 @@ func (uc ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedProd
 		return nil, err
 	}
 
-	err = uc.ProductRepo.UpdateProductByID(productID, param)
+	err = uc.ProductRepo.UpdateProductByID(ctx, productID, param)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +91,12 @@ func (uc ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedProd
 	return Product, nil
 }
 
-func (uc ProductUsecase) UpdateProductPhoto(productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {
+func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {
 	return nil, nil
 }
 
-func (uc ProductUsecase) DeleteProduct(productID int64) error {
-	if err := uc.ProductRepo.DeleteProductByID(productID); err != nil {
+func (uc ProductUsecase) DeleteProduct(ctx context.Context, productID int64) error {
+	if err := uc.ProductRepo.DeleteProductByID(ctx, productID); err != nil {
 		log.Println(err.Error())
 		return err
 	}

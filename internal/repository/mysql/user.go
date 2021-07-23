@@ -20,9 +20,15 @@ func NewUserRepository(DB *sql.DB) *UserRepository {
 	return repo
 }
 
-func (repo *UserRepository) GetUserByID(userID int64) (*entity.User, error) {
-	ctx := context.TODO()
-	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM users WHERE id = ?", userID)
+func (repo *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entity.User, error) {
+	var query = "SELECT * FROM users WHERE id = ?"
+	var row *sql.Row
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		row = tx.QueryRow(query, userID)
+	} else {
+		row = repo.DB.QueryRowContext(ctx, query, userID)
+	}
 
 	var user entity.User
 	var err = row.Scan(
@@ -52,9 +58,15 @@ func (repo *UserRepository) GetUserByID(userID int64) (*entity.User, error) {
 	return &user, nil
 }
 
-func (repo *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
-	ctx := context.TODO()
-	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM users WHERE email = ?", email)
+func (repo *UserRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+	var query = "SELECT * FROM users WHERE email = ?"
+	var row *sql.Row
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		row = tx.QueryRow(query, email)
+	} else {
+		row = repo.DB.QueryRowContext(ctx, query, email)
+	}
 
 	var user entity.User
 	var err = row.Scan(
@@ -84,9 +96,17 @@ func (repo *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 	return &user, nil
 }
 
-func (repo *UserRepository) GetUsersByMerchantID(merchantID int64) ([]*entity.User, error) {
-	ctx := context.TODO()
-	rows, err := repo.DB.QueryContext(ctx, "SELECT * FROM users WHERE merchant_id = ?", merchantID)
+func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID int64) ([]*entity.User, error) {
+	var query = "SELECT * FROM users WHERE merchant_id = ?"
+	var rows *sql.Rows
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		rows, err = tx.Query(query, merchantID)
+	} else {
+		rows, err = repo.DB.QueryContext(ctx, query, merchantID)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -123,19 +143,17 @@ func (repo *UserRepository) GetUsersByMerchantID(merchantID int64) ([]*entity.Us
 	return users, nil
 }
 
-func (repo *UserRepository) CreateUser(param entity.CreateUserParam) (*entity.User, error) {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(
-		ctx,
-		"INSERT INTO users(name, email, role, position, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-		param.Name,
-		param.Email,
-		param.Role,
-		param.Position,
-		param.Password,
-		param.MerchantID,
-		param.CreatedAt,
-		param.CreatedAt)
+func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error) {
+	var query = "INSERT INTO users(name, email, role, position, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.Password, param.MerchantID, param.CreatedAt, param.CreatedAt)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -162,12 +180,17 @@ func (repo *UserRepository) CreateUser(param entity.CreateUserParam) (*entity.Us
 	return user, nil
 }
 
-func (repo *UserRepository) UpdateByID(userID int64, param entity.UpdateUserParam) error {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(
-		ctx,
-		"UPDATE users SET name = ?, email = ?, role = ?, position = ?, password = ?, updated_at = ? WHERE id = ?",
-		param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
+func (repo *UserRepository) UpdateByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error {
+	var query = "UPDATE users SET name = ?, email = ?, role = ?, position = ?, password = ?, updated_at = ? WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -186,9 +209,17 @@ func (repo *UserRepository) UpdateByID(userID int64, param entity.UpdateUserPara
 	return nil
 }
 
-func (repo *UserRepository) DeleteUserByID(userID int64) error {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(ctx, "DELETE FROM users WHERE id = ?", userID)
+func (repo *UserRepository) DeleteUserByID(ctx context.Context, userID int64) error {
+	var query = "DELETE FROM users WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, userID)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, userID)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return err

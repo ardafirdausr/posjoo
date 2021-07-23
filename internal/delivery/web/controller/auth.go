@@ -30,7 +30,8 @@ func (ctrl AuthController) Register(c echo.Context) error {
 		return err
 	}
 
-	user, err := ctrl.ucs.AuthUsecase.Register(param)
+	ctx := c.Request().Context()
+	user, err := ctrl.ucs.AuthUsecase.Register(ctx, param)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -38,7 +39,7 @@ func (ctrl AuthController) Register(c echo.Context) error {
 
 	JWTSecretKey := os.Getenv("JWT_SECRET_KEY")
 	JWTToknizer := token.NewJWTTokenizer(JWTSecretKey)
-	JWTToken, err := ctrl.ucs.AuthUsecase.GenerateAuthToken(*user, JWTToknizer)
+	JWTToken, err := ctrl.ucs.AuthUsecase.GenerateAuthToken(ctx, *user, JWTToknizer)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -64,7 +65,8 @@ func (ctrl AuthController) Login(c echo.Context) error {
 		return err
 	}
 
-	user, err := ctrl.ucs.AuthUsecase.GetUserFromCredential(param)
+	ctx := c.Request().Context()
+	user, err := ctrl.ucs.AuthUsecase.GetUserFromCredential(ctx, param)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -72,7 +74,7 @@ func (ctrl AuthController) Login(c echo.Context) error {
 
 	JWTSecretKey := os.Getenv("JWT_SECRET_KEY")
 	JWTToknizer := token.NewJWTTokenizer(JWTSecretKey)
-	JWTToken, err := ctrl.ucs.AuthUsecase.GenerateAuthToken(*user, JWTToknizer)
+	JWTToken, err := ctrl.ucs.AuthUsecase.GenerateAuthToken(ctx, *user, JWTToknizer)
 	if err != nil {
 		log.Println(err.Error())
 		return err

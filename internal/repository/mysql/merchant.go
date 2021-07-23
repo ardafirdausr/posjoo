@@ -18,12 +18,17 @@ func NewMerchantRepository(DB *sql.DB) *MerchantRepository {
 	return repo
 }
 
-func (repo MerchantRepository) CreateMerchant(param entity.CreateMerchantParam) (*entity.Merchant, error) {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(
-		ctx,
-		"INSERT INTO merchants(name, address, phone, created_at, updated_at) VALUES(?, ?, ?, ?, ?)",
-		param.Name, param.Address, param.Phone, param.CreatedAt, param.CreatedAt)
+func (repo MerchantRepository) CreateMerchant(ctx context.Context, param entity.CreateMerchantParam) (*entity.Merchant, error) {
+	var query = "INSERT INTO merchants(name, address, phone, created_at, updated_at) VALUES(?, ?, ?, ?, ?)"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, param.Name, param.Address, param.Phone, param.CreatedAt, param.CreatedAt)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Address, param.Phone, param.CreatedAt, param.CreatedAt)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err

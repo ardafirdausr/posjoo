@@ -9,16 +9,14 @@ type repositories struct {
 	userRepo     internal.UserRepository
 	merchantRepo internal.MerchantRepository
 	productRepo  internal.ProductRepository
+	unitOfWork   internal.UnitOfWork
 }
 
 func newRepositories(drivers *drivers) *repositories {
-	userRepo := mysqlRepo.NewUserRepository(drivers.MySQL)
-	merchantRepo := mysqlRepo.NewMerchantRepository(drivers.MySQL)
-	productRepo := mysqlRepo.NewProductRepository(drivers.MySQL)
-
-	return &repositories{
-		userRepo:     userRepo,
-		merchantRepo: merchantRepo,
-		productRepo:  productRepo,
-	}
+	repos := new(repositories)
+	repos.userRepo = mysqlRepo.NewUserRepository(drivers.MySQL)
+	repos.merchantRepo = mysqlRepo.NewMerchantRepository(drivers.MySQL)
+	repos.productRepo = mysqlRepo.NewProductRepository(drivers.MySQL)
+	repos.unitOfWork = mysqlRepo.NewMySQLUnitOfWork(drivers.MySQL)
+	return repos
 }

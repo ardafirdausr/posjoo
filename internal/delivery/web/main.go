@@ -13,5 +13,10 @@ func Start(app *app.App) {
 	authGroup := web.Group("/auth")
 	authGroup.POST("/register", authController.Register)
 	authGroup.POST("/login", authController.Login)
+
+	// JWTSecretKey := os.Getenv("JWT_SECRET_KEY")
+	// JWTMiddleware := middleware.JWT(JWTSecretKey)
+	// authenticatedGroup := web.Group("", JWTMiddleware)
+
 	server.Start(web)
 }

@@ -28,6 +28,9 @@ type RegisterParam struct {
 	Email                string `json:"email" validate:"required,email"`
 	Password             string `json:"password" validate:"required"`
 	PasswordConfirmation string `json:"password_confirmation" validate:"required,eqfield=Password"`
+	BusinessName         string `json:"business_name" validate:"required"`
+	BusinessAddress      string `json:"business_address" validate:"required"`
+	BusinessPhone        string `json:"business_phone" validate:"required"`
 }
 
 type LoginParam struct {

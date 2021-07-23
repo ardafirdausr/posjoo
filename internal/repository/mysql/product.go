@@ -19,9 +19,15 @@ func NewProductRepository(DB *sql.DB) *ProductRepository {
 	return repo
 }
 
-func (repo *ProductRepository) GetProductByID(productID int64) (*entity.Product, error) {
-	ctx := context.TODO()
-	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM products WHERE id = ?", productID)
+func (repo ProductRepository) GetProductByID(ctx context.Context, productID int64) (*entity.Product, error) {
+	var query = "SELECT * FROM products WHERE id = ?"
+	var row *sql.Row
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		row = tx.QueryRow(query, productID)
+	} else {
+		row = repo.DB.QueryRowContext(ctx, query, productID)
+	}
 
 	var product entity.Product
 	var err = row.Scan(
@@ -48,9 +54,15 @@ func (repo *ProductRepository) GetProductByID(productID int64) (*entity.Product,
 	return &product, nil
 }
 
-func (repo *ProductRepository) GetProductBySKU(SKU string) (*entity.Product, error) {
-	ctx := context.TODO()
-	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM products WHERE sku = ?", SKU)
+func (repo ProductRepository) GetProductBySKU(ctx context.Context, SKU string) (*entity.Product, error) {
+	var query = "SELECT * FROM products WHERE sku = ?"
+	var row *sql.Row
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		row = tx.QueryRow(query, SKU)
+	} else {
+		row = repo.DB.QueryRowContext(ctx, query, SKU)
+	}
 
 	var product entity.Product
 	var err = row.Scan(
@@ -77,9 +89,17 @@ func (repo *ProductRepository) GetProductBySKU(SKU string) (*entity.Product, err
 	return &product, nil
 }
 
-func (repo *ProductRepository) GetProductsByMerchantID(merchantID int64) ([]*entity.Product, error) {
-	ctx := context.TODO()
-	rows, err := repo.DB.QueryContext(ctx, "SELECT * FROM products WHERE merchant_id = ?", merchantID)
+func (repo ProductRepository) GetProductsByMerchantID(ctx context.Context, merchantID int64) ([]*entity.Product, error) {
+	var query = "SELECT * FROM products WHERE merchant_id = ?"
+	var rows *sql.Rows
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		rows, err = tx.Query(query, merchantID)
+	} else {
+		rows, err = repo.DB.QueryContext(ctx, query, merchantID)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -113,12 +133,17 @@ func (repo *ProductRepository) GetProductsByMerchantID(merchantID int64) ([]*ent
 	return products, nil
 }
 
-func (repo *ProductRepository) CreateProduct(param entity.CreateProductParam) (*entity.Product, error) {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(
-		ctx,
-		"INSERT INTO products(name, sku, merchant_id, created_at, updated_at)",
-		param.Name, param.SKU, param.MerchantID, param.CreatedAt, param.CreatedAt)
+func (repo ProductRepository) CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error) {
+	var query = "INSERT INTO products(name, sku, merchant_id, created_at, updated_at)"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, param.Name, param.SKU, param.MerchantID, param.CreatedAt, param.CreatedAt)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.SKU, param.MerchantID, param.CreatedAt, param.CreatedAt)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -126,6 +151,7 @@ func (repo *ProductRepository) CreateProduct(param entity.CreateProductParam) (*
 
 	ID, err := res.LastInsertId()
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
@@ -141,12 +167,17 @@ func (repo *ProductRepository) CreateProduct(param entity.CreateProductParam) (*
 	return product, nil
 }
 
-func (repo *ProductRepository) UpdateProductByID(productId int64, param entity.UpdatedProductparam) error {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(
-		ctx,
-		"UPDATE products SET name = ?, sku = ?, updated_at = ? WHERE id = ?",
-		param.Name, param.SKU, param.UpdatedAt, productId)
+func (repo ProductRepository) UpdateProductByID(ctx context.Context, productId int64, param entity.UpdatedProductparam) error {
+	var query = "UPDATE products SET name = ?, sku = ?, updated_at = ? WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, param.Name, param.SKU, param.UpdatedAt, productId)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.SKU, param.UpdatedAt, productId)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -165,9 +196,17 @@ func (repo *ProductRepository) UpdateProductByID(productId int64, param entity.U
 	return nil
 }
 
-func (repo *ProductRepository) DeleteProductByID(productId int64) error {
-	ctx := context.TODO()
-	res, err := repo.DB.ExecContext(ctx, "DELETE FROM products WHERE id = ?", productId)
+func (repo ProductRepository) DeleteProductByID(ctx context.Context, productId int64) error {
+	var query = "DELETE FROM products WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, productId)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, productId)
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return err
