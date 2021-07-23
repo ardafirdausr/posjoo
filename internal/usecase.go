@@ -5,6 +5,7 @@ import "github.com/ardafirdausr/posjoo-server/internal/entity"
 type AuthUsecase interface {
 	Register(param entity.CreateUserParam) (*entity.User, error)
 	GetUserFromToken(token string, tokenizer Tokenizer) (*entity.User, error)
+	GetUserFromCredential(param entity.LoginParam) (*entity.User, error)
 	GenerateAuthToken(user entity.User, tokenizer Tokenizer) (string, error)
 }
 

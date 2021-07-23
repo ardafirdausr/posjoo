@@ -16,7 +16,7 @@ func NewAuthUsecase(userRepo internal.UserRepository) *AuthUsecase {
 	return &AuthUsecase{userRepo: userRepo}
 }
 
-func (uc *AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, error) {
+func (uc AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, error) {
 	existUser, err := uc.userRepo.GetUserByEmail(param.Email)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
@@ -40,7 +40,27 @@ func (uc *AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, err
 	return user, nil
 }
 
-func (uc *AuthUsecase) GetUserFromToken(token string, tokenizer internal.Tokenizer) (*entity.User, error) {
+func (uc AuthUsecase) GetUserFromCredential(param entity.LoginParam) (*entity.User, error) {
+	errInvalid := entity.ErrInvalidData{
+		Message: "Invalid Email or Password",
+		Err:     errors.New("invalid email or password"),
+	}
+
+	user, err := uc.userRepo.GetUserByEmail(param.Email)
+	if err != nil {
+		log.Panicln(err.Error())
+		return nil, errInvalid
+	}
+
+	hashPass := hashString(param.Password)
+	if user.Password != hashPass {
+		return nil, errInvalid
+	}
+
+	return user, nil
+}
+
+func (uc AuthUsecase) GetUserFromToken(token string, tokenizer internal.Tokenizer) (*entity.User, error) {
 	if len(token) < 1 {
 		return nil, errors.New("token is not provided")
 	}
@@ -60,7 +80,7 @@ func (uc *AuthUsecase) GetUserFromToken(token string, tokenizer internal.Tokeniz
 	return user, nil
 }
 
-func (uc *AuthUsecase) GenerateAuthToken(user entity.User, tokenizer internal.Tokenizer) (string, error) {
+func (uc AuthUsecase) GenerateAuthToken(user entity.User, tokenizer internal.Tokenizer) (string, error) {
 	tokenPayload := entity.TokenPayload{}
 	tokenPayload.ID = user.ID
 	tokenPayload.Name = user.Name

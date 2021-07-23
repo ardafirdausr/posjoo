@@ -23,6 +23,10 @@ type User struct {
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
+type LoginParam struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
 type CreateUserParam struct {
 	Name                 string    `json:"name" validate:"required"`
 	Email                string    `json:"email" validate:"required,email"`
