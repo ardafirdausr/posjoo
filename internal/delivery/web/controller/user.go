@@ -92,7 +92,7 @@ func (ctrl UserController) UpdateUser(c echo.Context) error {
 		return err
 	}
 
-	return jsonResponse(c, http.StatusNoContent, "Success", user)
+	return jsonResponse(c, http.StatusOK, "Success", user)
 }
 
 func (ctrl UserController) DeleteUser(c echo.Context) error {

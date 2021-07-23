@@ -49,15 +49,18 @@ type CreateUserParam struct {
 }
 
 type UpdateUserParam struct {
-	Name                 string    `json:"name" validate:"required"`
-	Email                string    `json:"email" validate:"required,email"`
-	Role                 UserRole  `json:"role" validate:"required"`
-	Position             string    `json:"position" validate:"required"`
-	Password             string    `json:"password" validate:"required"`
-	PasswordConfirmation string    `json:"password_confirmation" validate:"required,eqfield=Password"`
-	UpdatedAt            time.Time `json:"-"`
+	Name      string    `json:"name" validate:"required"`
+	Email     string    `json:"email" validate:"required,email"`
+	Role      UserRole  `json:"role" validate:"required"`
+	Position  string    `json:"position" validate:"required"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 type UpdateUserPhotoParam struct {
 	PhotoUrl *string `json:"photo_url" validate:"required"`
+}
+
+type UpdateUserPasswordParam struct {
+	Password             string `json:"password" validate:"required"`
+	PasswordConfirmation string `json:"password_confirmation" validate:"required,eqfield=Password"`
 }

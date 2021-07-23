@@ -25,9 +25,20 @@ func Start(app *app.App) {
 	userGroup := api.Group("/users", JWTMiddleware)
 	userGroup.GET("/:userID", userController.GetUser)
 	userGroup.GET("", userController.GetMerchantUsers)
-	userGroup.POST("/:userID", userController.CreateUser)
+	userGroup.POST("", userController.CreateUser)
 	userGroup.PUT("/:userID", userController.UpdateUser)
+	// userGroup.PUT("/:userID/password", userController.UpdateUserPassword)
+	// userGroup.PUT("/:userID/photo", userController.UpdateUserPhoto)
 	userGroup.DELETE("/:userID", userController.DeleteUser)
+
+	productController := controller.NewProductController(app.Usecases)
+	productGroup := api.Group("/products", JWTMiddleware)
+	productGroup.GET("/:productID", productController.GetProduct)
+	productGroup.GET("", productController.GetMerchantProducts)
+	productGroup.POST("", productController.CreateProduct)
+	productGroup.PUT("/:productID", productController.UpdateProduct)
+	// productGroup.PUT("/:productID/photo", productController.UpdateProductPhoto)
+	productGroup.DELETE("/:productID", productController.DeleteProduct)
 
 	server.Start(web)
 }

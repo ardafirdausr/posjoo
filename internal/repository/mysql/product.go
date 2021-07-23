@@ -33,8 +33,8 @@ func (repo ProductRepository) GetProductByID(ctx context.Context, productID int6
 	var err = row.Scan(
 		&product.ID,
 		&product.Name,
-		&product.PhotoUrl,
 		&product.SKU,
+		&product.PhotoUrl,
 		&product.MerchantID,
 		&product.CreatedAt,
 		&product.UpdatedAt,
@@ -68,8 +68,8 @@ func (repo ProductRepository) GetProductBySKU(ctx context.Context, SKU string) (
 	var err = row.Scan(
 		&product.ID,
 		&product.Name,
-		&product.PhotoUrl,
 		&product.SKU,
+		&product.PhotoUrl,
 		&product.MerchantID,
 		&product.CreatedAt,
 		&product.UpdatedAt,
@@ -134,7 +134,7 @@ func (repo ProductRepository) GetProductsByMerchantID(ctx context.Context, merch
 }
 
 func (repo ProductRepository) CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error) {
-	var query = "INSERT INTO products(name, sku, merchant_id, created_at, updated_at)"
+	var query = "INSERT INTO products(name, sku, merchant_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
 	var res sql.Result
 	var err error
 	txKey := transactionContextKey("tx")

@@ -86,14 +86,13 @@ func (uc UserUsecase) UpdateUser(ctx context.Context, userID int64, param entity
 		return nil, err
 	}
 
-	param.Password = hashString(param.Password)
 	param.UpdatedAt = time.Now()
 	if err = uc.userRepo.UpdateByID(ctx, userID, param); err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	return user, nil
+	return uc.userRepo.GetUserByID(ctx, userID)
 }
 
 func (uc UserUsecase) DeleteUser(ctx context.Context, userID int64) error {

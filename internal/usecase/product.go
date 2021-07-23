@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
@@ -43,27 +44,31 @@ func (uc ProductUsecase) CreateProduct(ctx context.Context, param entity.CreateP
 	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	if existProduct.MerchantID == param.MerchantID && existProduct.SKU == param.SKU {
+	if existProduct != nil && existProduct.SKU == param.SKU {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",
 			Err:     errors.New("SKU is already registered"),
 		}
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	Product, err := uc.ProductRepo.CreateProduct(ctx, param)
+	param.CreatedAt = time.Now()
+	product, err := uc.ProductRepo.CreateProduct(ctx, param)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	return Product, nil
+	return product, nil
 }
 
 func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, param entity.UpdatedProductparam) (*entity.Product, error) {
-	Product, err := uc.ProductRepo.GetProductByID(ctx, productID)
+	product, err := uc.ProductRepo.GetProductByID(ctx, productID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -72,23 +77,27 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	if existProduct.MerchantID == Product.MerchantID && existProduct.SKU == param.SKU {
+	if existProduct != nil && existProduct.ID != product.ID && existProduct.SKU == param.SKU {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",
 			Err:     errors.New("SKU is already registered"),
 		}
+		log.Println(err.Error())
 		return nil, err
 	}
 
+	param.UpdatedAt = time.Now()
 	err = uc.ProductRepo.UpdateProductByID(ctx, productID, param)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	return Product, nil
+	return uc.ProductRepo.GetProductByID(ctx, productID)
 }
 
 func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {

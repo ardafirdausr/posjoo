@@ -183,14 +183,14 @@ func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateU
 }
 
 func (repo *UserRepository) UpdateByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error {
-	var query = "UPDATE users SET name = ?, email = ?, role = ?, position = ?, password = ?, updated_at = ? WHERE id = ?"
+	var query = "UPDATE users SET name = ?, email = ?, role = ?, position = ?, updated_at = ? WHERE id = ?"
 	var res sql.Result
 	var err error
 	txKey := transactionContextKey("tx")
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
+		res, err = tx.Exec(query, param.Name, param.Email, param.Role, param.Position, param.UpdatedAt, userID)
 	} else {
-		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.Password, param.UpdatedAt, userID)
+		res, err = repo.DB.ExecContext(ctx, query, param.Name, param.Email, param.Role, param.Position, param.UpdatedAt, userID)
 	}
 
 	if err != nil {
