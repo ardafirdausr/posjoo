@@ -5,9 +5,9 @@ import "time"
 type UserRole string
 
 var (
-	UserRoleOwner   UserRole = "user.role.owner"
-	UserRoleManager UserRole = "user.role.manager"
-	UserRoleStaff   UserRole = "user.role.staff"
+	UserRoleOwner   UserRole = "owner"
+	UserRoleManager UserRole = "manager"
+	UserRoleStaff   UserRole = "staff"
 )
 
 type User struct {

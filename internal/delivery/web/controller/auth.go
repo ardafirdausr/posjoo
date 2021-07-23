@@ -25,9 +25,14 @@ func (ctrl AuthController) Register(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
+	if err := c.Validate(&param); err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
 	user, err := ctrl.ucs.AuthUsecase.Register(param)
 	if err != nil {
-		log.Panicln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -50,12 +55,18 @@ func (ctrl AuthController) Register(c echo.Context) error {
 func (ctrl AuthController) Login(c echo.Context) error {
 	var param entity.LoginParam
 	if err := c.Bind(&param); err != nil {
+		log.Println(err.Error())
 		return echo.ErrInternalServerError
+	}
+
+	if err := c.Validate(&param); err != nil {
+		log.Println(err.Error())
+		return err
 	}
 
 	user, err := ctrl.ucs.AuthUsecase.GetUserFromCredential(param)
 	if err != nil {
-		log.Panicln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 

@@ -34,11 +34,11 @@ func (repo *ProductRepository) GetProductByID(productID int64) (*entity.Product,
 		&product.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		err := entity.ErrNotFound{
+		errNotFound := entity.ErrNotFound{
 			Message: "Product not found",
 			Err:     err,
 		}
-		return nil, err
+		return nil, errNotFound
 	}
 
 	if err != nil {
@@ -63,11 +63,11 @@ func (repo *ProductRepository) GetProductBySKU(SKU string) (*entity.Product, err
 		&product.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		err := entity.ErrNotFound{
+		errNotFound := entity.ErrNotFound{
 			Message: "Product not found",
 			Err:     err,
 		}
-		return nil, err
+		return nil, errNotFound
 	}
 
 	if err != nil {

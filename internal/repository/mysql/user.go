@@ -38,11 +38,11 @@ func (repo *UserRepository) GetUserByID(userID int64) (*entity.User, error) {
 		&user.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		err := entity.ErrNotFound{
+		errNotFound := entity.ErrNotFound{
 			Message: "User not found",
 			Err:     err,
 		}
-		return nil, err
+		return nil, errNotFound
 	}
 
 	if err != nil {
@@ -70,11 +70,11 @@ func (repo *UserRepository) GetUserByEmail(email string) (*entity.User, error) {
 		&user.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		err := entity.ErrNotFound{
+		errNotFound := entity.ErrNotFound{
 			Message: "User not found",
 			Err:     err,
 		}
-		return nil, err
+		return nil, errNotFound
 	}
 
 	if err != nil {
@@ -127,7 +127,7 @@ func (repo *UserRepository) CreateUser(param entity.CreateUserParam) (*entity.Us
 	ctx := context.TODO()
 	res, err := repo.DB.ExecContext(
 		ctx,
-		"INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO users(name, email, role, position, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
 		param.Name,
 		param.Email,
 		param.Role,

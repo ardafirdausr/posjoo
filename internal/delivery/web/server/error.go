@@ -12,6 +12,13 @@ type CustomHTTPErrorHandler struct {
 	logger echo.Logger
 }
 
+func NewCustomHTTPErrorHandler(debug bool, logger echo.Logger) *CustomHTTPErrorHandler {
+	customErrHandler := new(CustomHTTPErrorHandler)
+	customErrHandler.debug = debug
+	customErrHandler.logger = logger
+	return customErrHandler
+}
+
 func (che CustomHTTPErrorHandler) Handler(err error, c echo.Context) {
 	he, ok := err.(*echo.HTTPError)
 	if !ok {

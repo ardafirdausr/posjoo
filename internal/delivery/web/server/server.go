@@ -23,10 +23,10 @@ func New() *echo.Echo {
 	e.Server.ReadTimeout = 30 * time.Second
 	e.Server.WriteTimeout = 30 * time.Second
 
-	validator := &CustomValidator{validator: validator.New()}
+	validator := NewCustomValidator(validator.New())
 	e.Validator = validator
 
-	errorHandler := &CustomHTTPErrorHandler{debug: isDebuging, logger: e.Logger}
+	errorHandler := NewCustomHTTPErrorHandler(isDebuging, e.Logger)
 	e.HTTPErrorHandler = errorHandler.Handler
 
 	e.Use(middleware.Logger())

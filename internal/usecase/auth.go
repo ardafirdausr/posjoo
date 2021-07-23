@@ -24,7 +24,7 @@ func (uc AuthUsecase) Register(param entity.RegisterParam) (*entity.User, error)
 		return nil, err
 	}
 
-	if existUser.Email == param.Email {
+	if existUser != nil && existUser.Email == param.Email {
 		err := entity.ErrInvalidData{
 			Message: "Email is already registered",
 			Err:     errors.New("email is already registered"),
@@ -57,7 +57,7 @@ func (uc AuthUsecase) GetUserFromCredential(param entity.LoginParam) (*entity.Us
 
 	user, err := uc.userRepo.GetUserByEmail(param.Email)
 	if err != nil {
-		log.Panicln(err.Error())
+		log.Println(err.Error())
 		return nil, errInvalid
 	}
 

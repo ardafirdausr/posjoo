@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
 	"github.com/go-playground/validator"
@@ -11,6 +13,19 @@ import (
 
 type CustomValidator struct {
 	validator *validator.Validate
+}
+
+func NewCustomValidator(validator *validator.Validate) *CustomValidator {
+	validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+	customValidator := new(CustomValidator)
+	customValidator.validator = validator
+	return customValidator
 }
 
 func (v *CustomValidator) Validate(i interface{}) error {
@@ -22,8 +37,9 @@ func (v *CustomValidator) Validate(i interface{}) error {
 		}
 		if len(validationErrors) > 0 {
 			validationError := validationErrors[0]
-			validationField := validationError.Field()
 			validationParam := validationError.Param()
+			validationField := validationError.Field()
+
 			switch validationError.Tag() {
 			case "required":
 				verr.Message = fmt.Sprintf("%s is required", validationField)
