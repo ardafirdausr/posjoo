@@ -1,9 +1,10 @@
 package usecase
 
 import (
-	"ardafirdausr/posjoo-server/internal"
-	"ardafirdausr/posjoo-server/internal/entity"
 	"log"
+
+	"github.com/ardafirdausr/posjoo-server/internal"
+	"github.com/ardafirdausr/posjoo-server/internal/entity"
 )
 
 type MerchantUsecase struct {

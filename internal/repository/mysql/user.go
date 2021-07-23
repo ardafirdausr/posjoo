@@ -1,12 +1,13 @@
 package mysql
 
 import (
-	"ardafirdausr/posjoo-server/internal/entity"
 	"context"
 	"database/sql"
 	"errors"
 	"log"
 	"time"
+
+	"github.com/ardafirdausr/posjoo-server/internal/entity"
 )
 
 type UserRepository struct {

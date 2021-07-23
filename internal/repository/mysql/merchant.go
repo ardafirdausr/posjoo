@@ -1,10 +1,11 @@
 package mysql
 
 import (
-	"ardafirdausr/posjoo-server/internal/entity"
 	"context"
 	"database/sql"
 	"log"
+
+	"github.com/ardafirdausr/posjoo-server/internal/entity"
 )
 
 type MerchantRepository struct {

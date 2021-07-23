@@ -1,6 +1,6 @@
 package internal
 
-import "ardafirdausr/posjoo-server/internal/entity"
+import "github.com/ardafirdausr/posjoo-server/internal/entity"
 
 type UserRepository interface {
 	GetUserByID(userID int64) (*entity.User, error)
