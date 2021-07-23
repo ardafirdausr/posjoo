@@ -19,7 +19,7 @@ func NewUserUsecase(userRepo internal.UserRepository) *UserUsecase {
 	return usecase
 }
 
-func (uc *UserUsecase) GetMerchantUsers(merchantID int64) ([]*entity.User, error) {
+func (uc UserUsecase) GetMerchantUsers(merchantID int64) ([]*entity.User, error) {
 	users, err := uc.userRepo.GetUsersByMerchantID(merchantID)
 	if err != nil {
 		log.Println(err.Error())
@@ -29,7 +29,7 @@ func (uc *UserUsecase) GetMerchantUsers(merchantID int64) ([]*entity.User, error
 	return users, nil
 }
 
-func (uc *UserUsecase) GetUser(userID int64) (*entity.User, error) {
+func (uc UserUsecase) GetUser(userID int64) (*entity.User, error) {
 	user, err := uc.userRepo.GetUserByID(userID)
 	if err != nil {
 		log.Println(err.Error())
@@ -39,7 +39,7 @@ func (uc *UserUsecase) GetUser(userID int64) (*entity.User, error) {
 	return user, nil
 }
 
-func (uc *UserUsecase) CreateUser(param entity.CreateUserParam) (*entity.User, error) {
+func (uc UserUsecase) CreateUser(param entity.CreateUserParam) (*entity.User, error) {
 	existUser, err := uc.userRepo.GetUserByEmail(param.Email)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
@@ -64,7 +64,7 @@ func (uc *UserUsecase) CreateUser(param entity.CreateUserParam) (*entity.User, e
 	return user, nil
 }
 
-func (uc *UserUsecase) UpdateUser(userID int64, param entity.UpdateUserParam) (*entity.User, error) {
+func (uc UserUsecase) UpdateUser(userID int64, param entity.UpdateUserParam) (*entity.User, error) {
 	user, err := uc.userRepo.GetUserByID(userID)
 	if err != nil {
 		log.Println(err.Error())
@@ -95,7 +95,7 @@ func (uc *UserUsecase) UpdateUser(userID int64, param entity.UpdateUserParam) (*
 	return user, nil
 }
 
-func (uc *UserUsecase) DeleteUser(userID int64) error {
+func (uc UserUsecase) DeleteUser(userID int64) error {
 	if err := uc.userRepo.DeleteUserByID(userID); err != nil {
 		log.Println(err.Error())
 		return err

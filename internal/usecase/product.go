@@ -18,7 +18,7 @@ func NewProductUsecase(ProductRepo internal.ProductRepository) *ProductUsecase {
 	return usecase
 }
 
-func (uc *ProductUsecase) GetMerchantProducts(merchantID int64) ([]*entity.Product, error) {
+func (uc ProductUsecase) GetMerchantProducts(merchantID int64) ([]*entity.Product, error) {
 	products, err := uc.ProductRepo.GetProductsByMerchantID(merchantID)
 	if err != nil {
 		log.Println(err.Error())
@@ -28,7 +28,7 @@ func (uc *ProductUsecase) GetMerchantProducts(merchantID int64) ([]*entity.Produ
 	return products, err
 }
 
-func (uc *ProductUsecase) GetProduct(productID int64) (*entity.Product, error) {
+func (uc ProductUsecase) GetProduct(productID int64) (*entity.Product, error) {
 	product, err := uc.ProductRepo.GetProductByID(productID)
 	if err != nil {
 		log.Println(err.Error())
@@ -38,7 +38,7 @@ func (uc *ProductUsecase) GetProduct(productID int64) (*entity.Product, error) {
 	return product, err
 }
 
-func (uc *ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entity.Product, error) {
+func (uc ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entity.Product, error) {
 	existProduct, err := uc.ProductRepo.GetProductBySKU(param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
@@ -61,7 +61,7 @@ func (uc *ProductUsecase) CreateProduct(param entity.CreateProductParam) (*entit
 	return Product, nil
 }
 
-func (uc *ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedProductparam) (*entity.Product, error) {
+func (uc ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedProductparam) (*entity.Product, error) {
 	Product, err := uc.ProductRepo.GetProductByID(productID)
 	if err != nil {
 		log.Println(err.Error())
@@ -90,11 +90,11 @@ func (uc *ProductUsecase) UpdateProduct(productID int64, param entity.UpdatedPro
 	return Product, nil
 }
 
-func (uc *ProductUsecase) UpdateProductPhoto(productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {
+func (uc ProductUsecase) UpdateProductPhoto(productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {
 	return nil, nil
 }
 
-func (uc *ProductUsecase) DeleteProduct(productID int64) error {
+func (uc ProductUsecase) DeleteProduct(productID int64) error {
 	if err := uc.ProductRepo.DeleteProductByID(productID); err != nil {
 		log.Println(err.Error())
 		return err

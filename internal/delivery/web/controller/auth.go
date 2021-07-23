@@ -7,7 +7,7 @@ import (
 
 	"github.com/ardafirdausr/posjoo-server/internal/app"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
-	"github.com/ardafirdausr/posjoo-server/internal/service/token"
+	"github.com/ardafirdausr/posjoo-server/internal/pkg/token"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,7 +20,31 @@ func NewAuthController(ucs *app.Usecases) *AuthController {
 }
 
 func (ctrl AuthController) Register(c echo.Context) error {
-	return nil
+	var param entity.RegisterParam
+	if err := c.Bind(&param); err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	user, err := ctrl.ucs.AuthUsecase.Register(param)
+	if err != nil {
+		log.Panicln(err.Error())
+		return err
+	}
+
+	JWTSecretKey := os.Getenv("JWT_SECRET_KEY")
+	JWTToknizer := token.NewJWTTokenizer(JWTSecretKey)
+	JWTToken, err := ctrl.ucs.AuthUsecase.GenerateAuthToken(*user, JWTToknizer)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	response := echo.Map{
+		"message": "Login Successful",
+		"data":    user,
+		"token":   JWTToken,
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 func (ctrl AuthController) Login(c echo.Context) error {

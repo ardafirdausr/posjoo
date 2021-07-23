@@ -17,7 +17,7 @@ func NewMerchantUsecase(merchantRepo internal.MerchantRepository) *MerchantUseca
 	return usecase
 }
 
-func (uc *MerchantUsecase) CreateMerchant(param entity.CreateMerchantParam) (*entity.Merchant, error) {
+func (uc MerchantUsecase) CreateMerchant(param entity.CreateMerchantParam) (*entity.Merchant, error) {
 	merchant, err := uc.merchantRepo.CreateMerchant(param)
 	if err != nil {
 		log.Println(err.Error())

@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
@@ -16,7 +17,7 @@ func NewAuthUsecase(userRepo internal.UserRepository) *AuthUsecase {
 	return &AuthUsecase{userRepo: userRepo}
 }
 
-func (uc AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, error) {
+func (uc AuthUsecase) Register(param entity.RegisterParam) (*entity.User, error) {
 	existUser, err := uc.userRepo.GetUserByEmail(param.Email)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
@@ -31,8 +32,16 @@ func (uc AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, erro
 		return nil, err
 	}
 
-	param.Password = hashString(param.Password)
-	user, err := uc.userRepo.CreateUser(param)
+	createUserPram := entity.CreateUserParam{
+		Name:       param.Name,
+		Email:      param.Email,
+		Role:       entity.UserRoleOwner,
+		Position:   "Owner",
+		Password:   hashString(param.Password),
+		MerchantID: 0,
+		CreatedAt:  time.Now(),
+	}
+	user, err := uc.userRepo.CreateUser(createUserPram)
 	if err != nil {
 		return nil, err
 	}
