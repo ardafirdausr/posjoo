@@ -11,10 +11,10 @@ type Usecases struct {
 	ProductUsecase internal.ProductUsecase
 }
 
-func newUsecases(repos *repositories) *Usecases {
+func newUsecases(repos *repositories, services *services) *Usecases {
 	usecases := new(Usecases)
 	usecases.AuthUsecase = usecase.NewAuthUsecase(repos.userRepo, repos.merchantRepo, repos.unitOfWork)
-	usecases.UserUsecase = usecase.NewUserUsecase(repos.userRepo)
-	usecases.ProductUsecase = usecase.NewProductUsecase(repos.productRepo)
+	usecases.UserUsecase = usecase.NewUserUsecase(repos.userRepo, services.storageService)
+	usecases.ProductUsecase = usecase.NewProductUsecase(repos.productRepo, services.storageService)
 	return usecases
 }

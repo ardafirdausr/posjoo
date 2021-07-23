@@ -10,6 +10,7 @@ type App struct {
 	Usecases     *Usecases
 	Repositories *repositories
 	Drivers      *drivers
+	Services     *services
 }
 
 func New() (*App, error) {
@@ -28,11 +29,13 @@ func New() (*App, error) {
 	}
 
 	repos := newRepositories(drivers)
-	ucs := newUsecases(repos)
+	services := newServices()
+	ucs := newUsecases(repos, services)
 
 	app.Drivers = drivers
 	app.Repositories = repos
 	app.Usecases = ucs
+	app.Services = services
 	return app, nil
 }
 

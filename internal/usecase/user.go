@@ -3,7 +3,10 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"mime/multipart"
+	"path/filepath"
 	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
@@ -12,11 +15,13 @@ import (
 
 type UserUsecase struct {
 	userRepo internal.UserRepository
+	storage  internal.Storage
 }
 
-func NewUserUsecase(userRepo internal.UserRepository) *UserUsecase {
+func NewUserUsecase(userRepo internal.UserRepository, storage internal.Storage) *UserUsecase {
 	usecase := new(UserUsecase)
 	usecase.userRepo = userRepo
+	usecase.storage = storage
 	return usecase
 }
 
@@ -97,7 +102,42 @@ func (uc UserUsecase) UpdateUser(ctx context.Context, userID int64, param entity
 	}
 
 	param.UpdatedAt = time.Now()
-	if err = uc.userRepo.UpdateByID(ctx, userID, param); err != nil {
+	if err = uc.userRepo.UpdateUserByID(ctx, userID, param); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return uc.userRepo.GetUserByID(ctx, userID)
+}
+
+func (uc UserUsecase) UpdateUserPassword(ctx context.Context, userID int64, param entity.UpdateUserPasswordParam) error {
+	hashPassword := hashString(param.Password)
+	if err := uc.userRepo.UpdateUserPasswordByID(ctx, userID, hashPassword); err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (uc UserUsecase) UpdateUserPhoto(ctx context.Context, userID int64, photo *multipart.FileHeader) (*entity.User, error) {
+	user, err := uc.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	photoName := fmt.Sprintf("user-%d", user.ID)
+	photoExt := filepath.Ext(photo.Filename)
+	filename := photoName + photoExt
+	photoDirectory := filepath.Join("image", "user")
+	url, err := uc.storage.Save(photo, photoDirectory, filename)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	if err := uc.userRepo.UpdateUserPhotoByID(ctx, userID, url); err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}

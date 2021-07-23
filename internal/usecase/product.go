@@ -3,7 +3,10 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"mime/multipart"
+	"path/filepath"
 	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
@@ -12,11 +15,13 @@ import (
 
 type ProductUsecase struct {
 	ProductRepo internal.ProductRepository
+	storage     internal.Storage
 }
 
-func NewProductUsecase(ProductRepo internal.ProductRepository) *ProductUsecase {
+func NewProductUsecase(ProductRepo internal.ProductRepository, storage internal.Storage) *ProductUsecase {
 	usecase := new(ProductUsecase)
 	usecase.ProductRepo = ProductRepo
+	usecase.storage = storage
 	return usecase
 }
 
@@ -100,8 +105,29 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 	return uc.ProductRepo.GetProductByID(ctx, productID)
 }
 
-func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error) {
-	return nil, nil
+func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64, photo *multipart.FileHeader) (*entity.Product, error) {
+	user, err := uc.ProductRepo.GetProductByID(ctx, productID)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	photoName := fmt.Sprintf("product-%d", user.ID)
+	photoExt := filepath.Ext(photo.Filename)
+	filename := photoName + photoExt
+	photoDirectory := filepath.Join("image", "product")
+	url, err := uc.storage.Save(photo, photoDirectory, filename)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	if err := uc.ProductRepo.UpdateProductPhotoByID(ctx, productID, url); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return uc.ProductRepo.GetProductByID(ctx, productID)
 }
 
 func (uc ProductUsecase) DeleteProduct(ctx context.Context, productID int64) error {

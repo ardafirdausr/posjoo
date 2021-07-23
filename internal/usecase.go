@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
 )
@@ -18,6 +19,8 @@ type UserUsecase interface {
 	GetUser(ctx context.Context, userID int64) (*entity.User, error)
 	CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error)
 	UpdateUser(ctx context.Context, userID int64, param entity.UpdateUserParam) (*entity.User, error)
+	UpdateUserPhoto(ctx context.Context, userID int64, photo *multipart.FileHeader) (*entity.User, error)
+	UpdateUserPassword(ctx context.Context, userID int64, param entity.UpdateUserPasswordParam) error
 	DeleteUser(ctx context.Context, userID int64) error
 }
 
@@ -26,7 +29,7 @@ type ProductUsecase interface {
 	GetProduct(ctx context.Context, productID int64) (*entity.Product, error)
 	CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error)
 	UpdateProduct(ctx context.Context, productID int64, param entity.UpdatedProductparam) (*entity.Product, error)
-	UpdateProductPhoto(ctx context.Context, productID int64, param entity.UpdateProductPhotoParam) (*entity.Product, error)
+	UpdateProductPhoto(ctx context.Context, productID int64, photo *multipart.FileHeader) (*entity.Product, error)
 	DeleteProduct(ctx context.Context, productID int64) error
 }
 

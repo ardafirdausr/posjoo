@@ -17,7 +17,9 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetUsersByMerchantID(ctx context.Context, merchantID int64) ([]*entity.User, error)
 	CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error)
-	UpdateByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error
+	UpdateUserByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error
+	UpdateUserPasswordByID(ctx context.Context, userID int64, password string) error
+	UpdateUserPhotoByID(ctx context.Context, userID int64, url string) error
 	DeleteUserByID(ctx context.Context, userID int64) error
 }
 
@@ -30,6 +32,7 @@ type ProductRepository interface {
 	GetProductBySKU(ctx context.Context, SKU string) (*entity.Product, error)
 	GetProductsByMerchantID(ctx context.Context, merchantID int64) ([]*entity.Product, error)
 	CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error)
-	UpdateProductByID(ctx context.Context, productId int64, param entity.UpdatedProductparam) error
-	DeleteProductByID(ctx context.Context, productId int64) error
+	UpdateProductByID(ctx context.Context, productID int64, param entity.UpdatedProductparam) error
+	UpdateProductPhotoByID(ctx context.Context, productID int64, url string) error
+	DeleteProductByID(ctx context.Context, productID int64) error
 }

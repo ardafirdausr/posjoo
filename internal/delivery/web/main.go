@@ -11,6 +11,8 @@ import (
 
 func Start(app *app.App) {
 	web := server.New()
+	web.Static("/storage", "storage")
+
 	api := web.Group("/api/v1")
 
 	authController := controller.NewAuthController(app.Usecases)
@@ -27,8 +29,8 @@ func Start(app *app.App) {
 	userGroup.GET("", userController.GetMerchantUsers)
 	userGroup.POST("", userController.CreateUser)
 	userGroup.PUT("/:userID", userController.UpdateUser)
-	// userGroup.PUT("/:userID/password", userController.UpdateUserPassword)
-	// userGroup.PUT("/:userID/photo", userController.UpdateUserPhoto)
+	userGroup.PUT("/:userID/password", userController.UpdateUserPassword)
+	userGroup.PUT("/:userID/photo", userController.UpdateUserPhoto)
 	userGroup.DELETE("/:userID", userController.DeleteUser)
 
 	productController := controller.NewProductController(app.Usecases)
@@ -37,7 +39,7 @@ func Start(app *app.App) {
 	productGroup.GET("", productController.GetMerchantProducts)
 	productGroup.POST("", productController.CreateProduct)
 	productGroup.PUT("/:productID", productController.UpdateProduct)
-	// productGroup.PUT("/:productID/photo", productController.UpdateProductPhoto)
+	productGroup.PUT("/:productID/photo", productController.UpdateProductPhoto)
 	productGroup.DELETE("/:productID", productController.DeleteProduct)
 
 	server.Start(web)

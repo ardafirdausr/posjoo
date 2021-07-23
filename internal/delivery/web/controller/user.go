@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/ardafirdausr/posjoo-server/internal/app"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
@@ -87,6 +90,72 @@ func (ctrl UserController) UpdateUser(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	user, err := ctrl.ucs.UserUsecase.UpdateUser(ctx, userID, param)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return jsonResponse(c, http.StatusOK, "Success", user)
+}
+
+func (ctrl UserController) UpdateUserPassword(c echo.Context) error {
+	userID, _ := strconv.ParseInt(c.Param("userID"), 10, 64)
+	var param entity.UpdateUserPasswordParam
+	if err := c.Bind(&param); err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	if err := c.Validate(&param); err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	ctx := c.Request().Context()
+	err := ctrl.ucs.UserUsecase.UpdateUserPassword(ctx, userID, param)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return jsonResponse(c, http.StatusOK, "Success", nil)
+}
+
+func (ctrl UserController) UpdateUserPhoto(c echo.Context) error {
+	userID, _ := strconv.ParseInt(c.Param("userID"), 10, 64)
+	fh, err := c.FormFile("photo")
+	if err != nil {
+		log.Println(err.Error())
+		return echo.ErrBadRequest
+	}
+
+	if fh == nil {
+		return echo.ErrBadRequest
+	}
+
+	rule := map[string]int64{
+		".jpg":  1024 * 1000 * 4,
+		".jpeg": 1024 * 1000 * 4,
+		".png":  1024 * 1000 * 4,
+	}
+	photoExt := strings.ToLower(filepath.Ext(fh.Filename))
+	maxSize, ok := rule[photoExt]
+	if !ok {
+		return entity.ErrInvalidData{
+			Message: "photo extension must be .jpg, .jpeg, or .png",
+			Err:     errors.New("photo extension must be .jpg, .jpeg, or .png"),
+		}
+	}
+
+	if fh.Size > maxSize {
+		return entity.ErrInvalidData{
+			Message: "Max photo size is 4MB",
+			Err:     errors.New("max photo size is 4MB"),
+		}
+	}
+
+	ctx := c.Request().Context()
+	user, err := ctrl.ucs.UserUsecase.UpdateUserPhoto(ctx, userID, fh)
 	if err != nil {
 		log.Println(err.Error())
 		return err

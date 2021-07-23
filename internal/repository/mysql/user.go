@@ -21,7 +21,7 @@ func NewUserRepository(DB *sql.DB) *UserRepository {
 	return repo
 }
 
-func (repo *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entity.User, error) {
+func (repo UserRepository) GetUserByID(ctx context.Context, userID int64) (*entity.User, error) {
 	var query = "SELECT * FROM users WHERE id = ?"
 	var row *sql.Row
 	txKey := transactionContextKey("tx")
@@ -58,7 +58,7 @@ func (repo *UserRepository) GetUserByID(ctx context.Context, userID int64) (*ent
 	return &user, nil
 }
 
-func (repo *UserRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (repo UserRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var query = "SELECT * FROM users WHERE email = ?"
 	var row *sql.Row
 	txKey := transactionContextKey("tx")
@@ -95,7 +95,7 @@ func (repo *UserRepository) GetUserByEmail(ctx context.Context, email string) (*
 	return &user, nil
 }
 
-func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID int64) ([]*entity.User, error) {
+func (repo UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID int64) ([]*entity.User, error) {
 	fmt.Println(merchantID)
 	var query = "SELECT * FROM users WHERE merchant_id = ?"
 	var rows *sql.Rows
@@ -142,7 +142,7 @@ func (repo *UserRepository) GetUsersByMerchantID(ctx context.Context, merchantID
 	return users, nil
 }
 
-func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error) {
+func (repo UserRepository) CreateUser(ctx context.Context, param entity.CreateUserParam) (*entity.User, error) {
 	var query = "INSERT INTO users(name, email, role, password, merchant_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?)"
 	var res sql.Result
 	var err error
@@ -178,7 +178,7 @@ func (repo *UserRepository) CreateUser(ctx context.Context, param entity.CreateU
 	return user, nil
 }
 
-func (repo *UserRepository) UpdateByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error {
+func (repo UserRepository) UpdateUserByID(ctx context.Context, userID int64, param entity.UpdateUserParam) error {
 	var query = "UPDATE users SET name = ?, email = ?, role = ?, updated_at = ? WHERE id = ?"
 	var res sql.Result
 	var err error
@@ -207,7 +207,65 @@ func (repo *UserRepository) UpdateByID(ctx context.Context, userID int64, param 
 	return nil
 }
 
-func (repo *UserRepository) DeleteUserByID(ctx context.Context, userID int64) error {
+func (repo UserRepository) UpdateUserPasswordByID(ctx context.Context, userID int64, password string) error {
+	var query = "UPDATE users SET password = ? WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, password, userID)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, password, userID)
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	if num, _ := res.RowsAffected(); num < 1 {
+		err := errors.New("failed to update user password")
+		enf := entity.ErrNotFound{
+			Message: "User not found",
+			Err:     err,
+		}
+		log.Println(enf.Error())
+		return enf
+	}
+
+	return nil
+}
+
+func (repo UserRepository) UpdateUserPhotoByID(ctx context.Context, userID int64, url string) error {
+	var query = "UPDATE users SET photo_url = ? WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, url, userID)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, url, userID)
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	if num, _ := res.RowsAffected(); num < 1 {
+		err := errors.New("failed to update user")
+		enf := entity.ErrNotFound{
+			Message: "User not found",
+			Err:     err,
+		}
+		log.Println(enf.Error())
+		return enf
+	}
+
+	return nil
+}
+
+func (repo UserRepository) DeleteUserByID(ctx context.Context, userID int64) error {
 	var query = "DELETE FROM users WHERE id = ?"
 	var res sql.Result
 	var err error

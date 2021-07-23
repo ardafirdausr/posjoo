@@ -196,6 +196,35 @@ func (repo ProductRepository) UpdateProductByID(ctx context.Context, productId i
 	return nil
 }
 
+func (repo ProductRepository) UpdateProductPhotoByID(ctx context.Context, productID int64, url string) error {
+	var query = "UPDATE products SET photo_url = ? WHERE id = ?"
+	var res sql.Result
+	var err error
+	txKey := transactionContextKey("tx")
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		res, err = tx.Exec(query, url, productID)
+	} else {
+		res, err = repo.DB.ExecContext(ctx, query, url, productID)
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	if num, _ := res.RowsAffected(); num < 1 {
+		err := errors.New("failed to update product photo")
+		enf := entity.ErrNotFound{
+			Message: "Product not found",
+			Err:     err,
+		}
+		log.Println(enf.Error())
+		return enf
+	}
+
+	return nil
+}
+
 func (repo ProductRepository) DeleteProductByID(ctx context.Context, productId int64) error {
 	var query = "DELETE FROM products WHERE id = ?"
 	var res sql.Result
