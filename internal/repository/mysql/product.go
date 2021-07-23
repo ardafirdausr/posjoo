@@ -48,6 +48,35 @@ func (repo *ProductRepository) GetProductByID(productID int64) (*entity.Product,
 	return &product, nil
 }
 
+func (repo *ProductRepository) GetProductBySKU(SKU string) (*entity.Product, error) {
+	ctx := context.TODO()
+	row := repo.DB.QueryRowContext(ctx, "SELECT * FROM products WHERE sku = ?", SKU)
+
+	var product entity.Product
+	var err = row.Scan(
+		&product.ID,
+		&product.Name,
+		&product.PhotoUrl,
+		&product.SKU,
+		&product.MerchantID,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		err := entity.ErrNotFound{
+			Message: "Product not found",
+			Err:     err,
+		}
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
+
 func (repo *ProductRepository) GetProductsByMerchantID(merchantID int64) ([]*entity.Product, error) {
 	ctx := context.TODO()
 	rows, err := repo.DB.QueryContext(ctx, "SELECT * FROM products WHERE merchant_id = ?", merchantID)

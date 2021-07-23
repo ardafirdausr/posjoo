@@ -17,6 +17,7 @@ type MerchantRepository interface {
 
 type ProductRepository interface {
 	GetProductByID(productID int64) (*entity.Product, error)
+	GetProductBySKU(SKU string) (*entity.Product, error)
 	GetProductsByMerchantID(merchantID int64) ([]*entity.Product, error)
 	CreateProduct(param entity.CreateProductParam) (*entity.Product, error)
 	UpdateProductByID(productId int64, param entity.UpdatedProductparam) error

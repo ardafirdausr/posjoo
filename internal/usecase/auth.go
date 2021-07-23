@@ -31,6 +31,7 @@ func (uc *AuthUsecase) Register(param entity.CreateUserParam) (*entity.User, err
 		return nil, err
 	}
 
+	param.Password = hashString(param.Password)
 	user, err := uc.userRepo.CreateUser(param)
 	if err != nil {
 		return nil, err

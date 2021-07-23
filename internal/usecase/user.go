@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
@@ -53,6 +54,8 @@ func (uc *UserUsecase) CreateUser(param entity.CreateUserParam) (*entity.User, e
 		return nil, err
 	}
 
+	param.Password = hashString(param.Password)
+	param.CreatedAt = time.Now()
 	user, err := uc.userRepo.CreateUser(param)
 	if err != nil {
 		return nil, err
@@ -82,6 +85,8 @@ func (uc *UserUsecase) UpdateUser(userID int64, param entity.UpdateUserParam) (*
 		return nil, err
 	}
 
+	param.Password = hashString(param.Password)
+	param.UpdatedAt = time.Now()
 	if err = uc.userRepo.UpdateByID(userID, param); err != nil {
 		log.Println(err.Error())
 		return nil, err
