@@ -47,14 +47,14 @@ func (uc ProductUsecase) GetProduct(ctx context.Context, productID int64) (*enti
 }
 
 func (uc ProductUsecase) CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error) {
-	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
+	existProduct, err := uc.ProductRepo.GetProductBySKUIndex(ctx, param.MerchantID, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	isExistProductOfMerchant := existProduct != nil && existProduct.MerchantID == param.MerchantID && existProduct.SKU == param.SKU
+	isExistProductOfMerchant := existProduct != nil && existProduct.SKU == param.SKU
 	if isExistProductOfMerchant {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",
@@ -81,14 +81,14 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 		return nil, err
 	}
 
-	existProduct, err := uc.ProductRepo.GetProductBySKU(ctx, param.SKU)
+	existProduct, err := uc.ProductRepo.GetProductBySKUIndex(ctx, product.MerchantID, param.SKU)
 	_, errNotFound := err.(entity.ErrNotFound)
 	if err != nil && !errNotFound {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	isExistProductOfMerchant := existProduct != nil && existProduct.MerchantID == product.MerchantID && existProduct.ID != product.ID && existProduct.SKU == param.SKU
+	isExistProductOfMerchant := existProduct != nil && existProduct.ID != product.ID && existProduct.SKU == param.SKU
 	if isExistProductOfMerchant {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",

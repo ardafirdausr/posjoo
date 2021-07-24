@@ -29,7 +29,7 @@ type MerchantRepository interface {
 
 type ProductRepository interface {
 	GetProductByID(ctx context.Context, productID int64) (*entity.Product, error)
-	GetProductBySKU(ctx context.Context, SKU string) (*entity.Product, error)
+	GetProductBySKUIndex(ctx context.Context, merchantID int64, SKU string) (*entity.Product, error)
 	GetProductsByMerchantID(ctx context.Context, merchantID int64) ([]*entity.Product, error)
 	CreateProduct(ctx context.Context, param entity.CreateProductParam) (*entity.Product, error)
 	UpdateProductByID(ctx context.Context, productID int64, param entity.UpdatedProductparam) error

@@ -54,14 +54,14 @@ func (repo ProductRepository) GetProductByID(ctx context.Context, productID int6
 	return &product, nil
 }
 
-func (repo ProductRepository) GetProductBySKU(ctx context.Context, SKU string) (*entity.Product, error) {
-	var query = "SELECT * FROM products WHERE sku = ?"
+func (repo ProductRepository) GetProductBySKUIndex(ctx context.Context, merchantID int64, SKU string) (*entity.Product, error) {
+	var query = "SELECT * FROM products WHERE merchant_id = ? AND sku = ?"
 	var row *sql.Row
 	txKey := transactionContextKey("tx")
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		row = tx.QueryRow(query, SKU)
+		row = tx.QueryRow(query, merchantID, SKU)
 	} else {
-		row = repo.DB.QueryRowContext(ctx, query, SKU)
+		row = repo.DB.QueryRowContext(ctx, query, merchantID, SKU)
 	}
 
 	var product entity.Product
