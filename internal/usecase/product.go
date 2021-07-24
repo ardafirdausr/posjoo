@@ -54,7 +54,8 @@ func (uc ProductUsecase) CreateProduct(ctx context.Context, param entity.CreateP
 		return nil, err
 	}
 
-	if existProduct != nil && existProduct.SKU == param.SKU {
+	isExistProductOfMerchant := existProduct != nil && existProduct.MerchantID == param.MerchantID && existProduct.SKU == param.SKU
+	if isExistProductOfMerchant {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",
 			Err:     errors.New("SKU is already registered"),
@@ -87,7 +88,8 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 		return nil, err
 	}
 
-	if existProduct != nil && existProduct.ID != product.ID && existProduct.SKU == param.SKU {
+	isExistProductOfMerchant := existProduct != nil && existProduct.MerchantID == product.MerchantID && existProduct.ID != product.ID && existProduct.SKU == param.SKU
+	if isExistProductOfMerchant {
 		err := entity.ErrInvalidData{
 			Message: "SKU is already registered",
 			Err:     errors.New("SKU is already registered"),
