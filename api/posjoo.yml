@@ -23,8 +23,10 @@ paths:
           - Auth
         summary: Register user and the business
         operationId: register
+        requestBody:
+          $ref: '#/components/requestBodies/Register'
         responses:
-          '200':
+          '201':
             $ref: '#/components/responses/UserLogged'
           '400':
             $ref: '#/components/responses/ErrorBadRequest'
@@ -34,6 +36,8 @@ paths:
         - Auth
       summary: Login using email and password
       operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/Login'
       responses:
         '200':
           $ref: '#/components/responses/UserLogged'
@@ -42,42 +46,63 @@ paths:
   /users:
     get:
       tags:
-        - Product
+        - User
       summary: Get all users
-      operationId: getAllProducts
+      operationId: getAllUsers
       description: |
-        Only accessable by logged user
+        Only accessable by logged user and return all merchant user of the logged user
       security:
         - bearerAuth: []
       responses:
         '200':
-          $ref: '#/components/responses/ProductList'
+          $ref: '#/components/responses/UserList'
     post:
       tags:
-        - Product
+        - User
       summary: Create new user
       description: |
         Only accessable by logged user
-      operationId: createProduct
+      operationId: createUser
       security:
         - bearerAuth: []
       requestBody:
-        $ref: '#/components/requestBodies/CreateProduct'
+        $ref: '#/components/requestBodies/CreateUser'
       responses:
-        '200':
-          $ref: '#/components/responses/Product'
+        '201':
+          $ref: '#/components/responses/User'
         '400':
           $ref: '#/components/responses/ErrorBadRequest'
         '500':
           $ref: '#/components/responses/ErrorInternalServer'
   /users/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get a user
+      operationId: getUser
+      description: |
+        Only accessable by logged user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
     put:
       tags:
-        - Product
+        - User
       summary: Update a user
       description: |
         Only accessable by logged user
-      operationId: updateProduct
+      operationId: updateUser
       security:
         - bearerAuth: []
       parameters:
@@ -86,23 +111,23 @@ paths:
           description: The ID of user to be delete.
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
-        $ref: '#/components/requestBodies/UpdateProduct'
+        $ref: '#/components/requestBodies/UpdateUser'
       responses:
         '200':
-          $ref: '#/components/responses/Product'
+          $ref: '#/components/responses/User'
         '404':
           $ref: '#/components/responses/ErrorNotFound'
         '500':
           $ref: '#/components/responses/ErrorInternalServer'
     delete:
       tags:
-        - Product
+        - User
       summary: Delete a user
       description: |
         Only accessable by logged user
-      operationId: deleteProduct
+      operationId: deleteUser
       security:
         - bearerAuth: []
       parameters:
@@ -111,10 +136,62 @@ paths:
           description: The ID of user to be delete.
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: 'No Content'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /users/{userId}/password:
+    put:
+      tags:
+        - User
+      summary: Update a user password
+      description: |
+        Only accessable by logged user
+      operationId: updateUserPassword
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserPassword'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /users/{userId}/photo:
+    put:
+      tags:
+        - User
+      summary: Update a user photo
+      description: |
+        Only accessable by logged user
+      operationId: updateUserPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserPhoto'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
         '404':
           $ref: '#/components/responses/ErrorNotFound'
         '500':
@@ -123,10 +200,10 @@ paths:
     get:
       tags:
         - Product
-      summary: Get all products
+      summary: Get all merchant products
       operationId: getAllProducts
       description: |
-        Only accessable by logged user
+        Only accessable by logged user and return the user's merchant products
       security:
         - bearerAuth: []
       responses:
@@ -144,20 +221,115 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateProduct'
       responses:
-        '200':
+        '201':
           $ref: '#/components/responses/Product'
         '400':
           $ref: '#/components/responses/ErrorBadRequest'
         '500':
           $ref: '#/components/responses/ErrorInternalServer'
   /products/{productId}:
+    get:
+      tags:
+        - Product
+      summary: Get a product
+      operationId: getProduct
+      description: |
+        Only accessable by logged user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of product to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+    put:
+      tags:
+        - Product
+      summary: Update a product
+      description: |
+        Only accessable by logged user
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProduct'
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+        - Product
+      summary: Delete a product
+      description: |
+        Only accessable by logged product
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of product to be delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'No Content'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /products/{productId}/photo:
+    put:
+      tags:
+        - Product
+      summary: Update a product photo
+      description: |
+        Only accessable by logged user
+      operationId: updateProductPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProductPhoto'
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
     User:
       type: object
       properties:
         id:
-          type: int
+          type: integer
           example: 90
         name:
           type: string
@@ -173,7 +345,7 @@ components:
           enum: ['owner', 'manager', 'staff']
           example: 'manager'
         merchant_id:
-          type: int
+          type: integer
           example: 2
         created_at:
           type: string
@@ -185,7 +357,7 @@ components:
       type: object
       properties:
         id:
-          type: int
+          type: integer
           example: 90
         name:
           type: string
@@ -197,26 +369,143 @@ components:
           type: string
           example: 'https://image.com/spt-htm.jpg'
         merchant_id:
-          type: int
+          type: integer
           example: 2
         created_at:
           type: string
-          format: data
+          format: date
         updated_at:
+          type: string
+          format: date
   requestBodies:
-    Login:
-      description: User SSO payload
+    Register:
+      description: Register user
       content:
         application/json:
           schema:
             type: object
             required:
-            - task
+            - name
+            - email
+            - password
+            - password_confirmation
+            - business_name
+            - business_address
+            - business_phone
             properties:
-              task:
+              name:
                 type: string
-                minLength: 0
-                maxLength: 50
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+              business_name:
+                type: string
+                example: 'Usaha Maju'
+              business_address:
+                type: string
+                example: 'Sesame Street, Malang'
+              business_phone:
+                type: string
+                example: '0341 467712'
+    Login:
+      description: Login User
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - email
+            - password
+            properties:
+              email:
+                type: string
+                example: 'user@mail.com'
+              password:
+                type: string
+                example: 'Secret123'
+    CreateUser:
+      description: new user data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - email
+            - role
+            - password
+            - password_confirmation
+            properties:
+              name:
+                type: string
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              role:
+                type: string
+                enum: [manager, staff]
+                example: manager
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+    UpdateUser:
+      description: update user data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - email
+            - role
+            properties:
+              name:
+                type: string
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              role:
+                type: string
+                enum: [manager, staff]
+                example: manager
+    UpdateUserPassword:
+      description: change user password
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - password
+            - password_confirmation
+            properties:
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+    UpdateUserPhoto:
+      description: change user photo
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              photo:
+                type: string
+                format: binary
     CreateProduct:
       description: new product data
       content:
@@ -224,25 +513,41 @@ components:
           schema:
             type: object
             required:
-            - task
+            - name
+            - sku
             properties:
-              task:
+              name:
                 type: string
-                minLength: 0
-                maxLength: 50
+                example: 'Sepatu Hitam'
+              sku:
+                type: string
+                example: 'spt-htm'
     UpdateProduct:
       description: new product data
       content:
         application/json:
           schema:
             type: object
+            required:
+            - name
+            - sku
             properties:
-              task:
+              name:
                 type: string
-                minLength: 0
-                maxLength: 50
-              completed:
-                type: boolean
+                example: 'Sepatu Hitam'
+              sku:
+                type: string
+                example: 'spt-htm'
+    UpdateProductPhoto:
+      description: change product photo
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              photo:
+                type: string
+                format: binary
   responses:
     ErrorBadRequest:
       description: Bad request data.
@@ -253,7 +558,7 @@ components:
             properties:
               message:
                 type: string
-                example: 'Data not found'
+                example: 'Invalid data'
     ErrorUnauthorized:
       description: The Request is unautorized.
       content:
@@ -294,6 +599,16 @@ components:
               message:
                 type: string
                 example: 'Internal server error'
+    Success:
+      description: Success message
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Success'
     UserLogged:
       description: User crendential and information
       content:
@@ -307,6 +622,30 @@ components:
                 $ref: '#/components/schemas/User'
               token:
                 type: string
+    UserList:
+      description: List of users
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    User:
+      description: The user
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/components/schemas/User'
     ProductList:
       description: List of products
       content:

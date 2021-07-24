@@ -51,7 +51,7 @@ func (ctrl AuthController) Register(c echo.Context) error {
 		"data":    user,
 		"token":   JWTToken,
 	}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusCreated, response)
 }
 
 func (ctrl AuthController) Login(c echo.Context) error {
