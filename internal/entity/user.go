@@ -53,10 +53,6 @@ type UpdateUserParam struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
-type UpdateUserPhotoParam struct {
-	PhotoUrl *string `json:"photo_url" validate:"required"`
-}
-
 type UpdateUserPasswordParam struct {
 	Password             string `json:"password" validate:"required"`
 	PasswordConfirmation string `json:"password_confirmation" validate:"required,eqfield=Password"`

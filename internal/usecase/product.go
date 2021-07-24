@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime/multipart"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
@@ -97,6 +98,10 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 
 	param.UpdatedAt = time.Now()
 	err = uc.ProductRepo.UpdateProductByID(ctx, productID, param)
+	if _, isEnf := err.(entity.ErrNotFound); isEnf {
+		return product, nil
+	}
+
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -106,13 +111,41 @@ func (uc ProductUsecase) UpdateProduct(ctx context.Context, productID int64, par
 }
 
 func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64, photo *multipart.FileHeader) (*entity.Product, error) {
-	user, err := uc.ProductRepo.GetProductByID(ctx, productID)
+	product, err := uc.ProductRepo.GetProductByID(ctx, productID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	photoName := fmt.Sprintf("product-%d", user.ID)
+	if photo == nil {
+		return nil, entity.ErrInvalidData{
+			Message: "photo cannot be empty",
+			Err:     errors.New("photo cannot be empty"),
+		}
+	}
+
+	rule := map[string]int64{
+		".jpg":  1024 * 1000 * 4,
+		".jpeg": 1024 * 1000 * 4,
+		".png":  1024 * 1000 * 4,
+	}
+	ext := strings.ToLower(filepath.Ext(photo.Filename))
+	maxSize, ok := rule[ext]
+	if !ok {
+		return nil, entity.ErrInvalidData{
+			Message: "photo extension must be .jpg, .jpeg, or .png",
+			Err:     errors.New("photo extension must be .jpg, .jpeg, or .png"),
+		}
+	}
+
+	if photo.Size > maxSize {
+		return nil, entity.ErrInvalidData{
+			Message: "Max photo size is 4MB",
+			Err:     errors.New("max photo size is 4MB"),
+		}
+	}
+
+	photoName := fmt.Sprintf("product-%d", product.ID)
 	photoExt := filepath.Ext(photo.Filename)
 	filename := photoName + photoExt
 	photoDirectory := filepath.Join("image", "product")
@@ -122,7 +155,12 @@ func (uc ProductUsecase) UpdateProductPhoto(ctx context.Context, productID int64
 		return nil, err
 	}
 
-	if err := uc.ProductRepo.UpdateProductPhotoByID(ctx, productID, url); err != nil {
+	err = uc.ProductRepo.UpdateProductPhotoByID(ctx, productID, url)
+	if _, isEnf := err.(entity.ErrNotFound); isEnf {
+		return product, nil
+	}
+
+	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}

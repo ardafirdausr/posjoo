@@ -24,7 +24,3 @@ type UpdatedProductparam struct {
 	SKU       string    `json:"sku" validate:"required"`
 	UpdatedAt time.Time `json:"-"`
 }
-
-type UpdateProductPhotoParam struct {
-	PhotoUrl *string `json:"photo_url" validate:"required"`
-}

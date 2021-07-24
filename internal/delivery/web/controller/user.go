@@ -1,12 +1,9 @@
 package controller
 
 import (
-	"errors"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/ardafirdausr/posjoo-server/internal/app"
 	"github.com/ardafirdausr/posjoo-server/internal/entity"
@@ -127,31 +124,6 @@ func (ctrl UserController) UpdateUserPhoto(c echo.Context) error {
 	if err != nil {
 		log.Println(err.Error())
 		return echo.ErrBadRequest
-	}
-
-	if fh == nil {
-		return echo.ErrBadRequest
-	}
-
-	rule := map[string]int64{
-		".jpg":  1024 * 1000 * 4,
-		".jpeg": 1024 * 1000 * 4,
-		".png":  1024 * 1000 * 4,
-	}
-	photoExt := strings.ToLower(filepath.Ext(fh.Filename))
-	maxSize, ok := rule[photoExt]
-	if !ok {
-		return entity.ErrInvalidData{
-			Message: "photo extension must be .jpg, .jpeg, or .png",
-			Err:     errors.New("photo extension must be .jpg, .jpeg, or .png"),
-		}
-	}
-
-	if fh.Size > maxSize {
-		return entity.ErrInvalidData{
-			Message: "Max photo size is 4MB",
-			Err:     errors.New("max photo size is 4MB"),
-		}
 	}
 
 	ctx := c.Request().Context()

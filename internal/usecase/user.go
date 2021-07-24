@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime/multipart"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ardafirdausr/posjoo-server/internal"
@@ -60,6 +61,21 @@ func (uc UserUsecase) CreateUser(ctx context.Context, param entity.CreateUserPar
 		return nil, err
 	}
 
+	isRoleAllowed := false
+	allowedRoles := []entity.UserRole{entity.UserRoleManager, entity.UserRoleStaff}
+	for _, role := range allowedRoles {
+		if param.Role == role {
+			isRoleAllowed = true
+		}
+	}
+	if !isRoleAllowed {
+		err := entity.ErrInvalidData{
+			Message: "Cannot create user with requested role",
+			Err:     errors.New("cannot create user with requested rol"),
+		}
+		return nil, err
+	}
+
 	param.Password = hashString(param.Password)
 	param.CreatedAt = time.Now()
 	user, err := uc.userRepo.CreateUser(ctx, param)
@@ -101,8 +117,28 @@ func (uc UserUsecase) UpdateUser(ctx context.Context, userID int64, param entity
 		return nil, err
 	}
 
+	isRoleAllowed := false
+	allowedRoles := []entity.UserRole{entity.UserRoleManager, entity.UserRoleStaff}
+	for _, role := range allowedRoles {
+		if param.Role == role {
+			isRoleAllowed = true
+		}
+	}
+	if !isRoleAllowed {
+		err := entity.ErrInvalidData{
+			Message: "Cannot create user with requested role",
+			Err:     errors.New("cannot create user with requested rol"),
+		}
+		return nil, err
+	}
+
 	param.UpdatedAt = time.Now()
-	if err = uc.userRepo.UpdateUserByID(ctx, userID, param); err != nil {
+	err = uc.userRepo.UpdateUserByID(ctx, userID, param)
+	if _, isEnf := err.(entity.ErrNotFound); isEnf {
+		return user, nil
+	}
+
+	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
@@ -127,6 +163,34 @@ func (uc UserUsecase) UpdateUserPhoto(ctx context.Context, userID int64, photo *
 		return nil, err
 	}
 
+	if photo == nil {
+		return nil, entity.ErrInvalidData{
+			Message: "photo cannot be empty",
+			Err:     errors.New("photo cannot be empty"),
+		}
+	}
+
+	rule := map[string]int64{
+		".jpg":  1024 * 1000 * 4,
+		".jpeg": 1024 * 1000 * 4,
+		".png":  1024 * 1000 * 4,
+	}
+	ext := strings.ToLower(filepath.Ext(photo.Filename))
+	maxSize, ok := rule[ext]
+	if !ok {
+		return nil, entity.ErrInvalidData{
+			Message: "photo extension must be .jpg, .jpeg, or .png",
+			Err:     errors.New("photo extension must be .jpg, .jpeg, or .png"),
+		}
+	}
+
+	if photo.Size > maxSize {
+		return nil, entity.ErrInvalidData{
+			Message: "Max photo size is 4MB",
+			Err:     errors.New("max photo size is 4MB"),
+		}
+	}
+
 	photoName := fmt.Sprintf("user-%d", user.ID)
 	photoExt := filepath.Ext(photo.Filename)
 	filename := photoName + photoExt
@@ -137,7 +201,12 @@ func (uc UserUsecase) UpdateUserPhoto(ctx context.Context, userID int64, photo *
 		return nil, err
 	}
 
-	if err := uc.userRepo.UpdateUserPhotoByID(ctx, userID, url); err != nil {
+	err = uc.userRepo.UpdateUserPhotoByID(ctx, userID, url)
+	if _, isEnf := err.(entity.ErrNotFound); isEnf {
+		return user, nil
+	}
+
+	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
