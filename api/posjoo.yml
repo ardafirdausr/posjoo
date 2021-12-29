@@ -1,0 +1,677 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ardafirdausr/POSJOO/1.0.0
+info:
+  version: 1.0.0
+  title: POS MAJOO
+  description: Simple implementation of Majoo Point of Sales
+  contact:
+    email: ardafirdausr@gmail.com
+tags:
+  - name: Auth
+    description: Operations for user authentication
+  - name: User
+    description: Operations for user
+  - name: Product
+    description: Operations for product
+paths:
+  /auth/register:
+      post:
+        tags:
+          - Auth
+        summary: Register user and the business
+        operationId: register
+        requestBody:
+          $ref: '#/components/requestBodies/Register'
+        responses:
+          '201':
+            $ref: '#/components/responses/UserLogged'
+          '400':
+            $ref: '#/components/responses/ErrorBadRequest'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login using email and password
+      operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/Login'
+      responses:
+        '200':
+          $ref: '#/components/responses/UserLogged'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+  /users:
+    get:
+      tags:
+        - User
+      summary: Get all users
+      operationId: getAllUsers
+      description: |
+        Only accessable by logged user and return all merchant user of the logged user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/UserList'
+    post:
+      tags:
+        - User
+      summary: Create new user
+      description: |
+        Only accessable by logged user
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateUser'
+      responses:
+        '201':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /users/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get a user
+      operationId: getUser
+      description: |
+        Only accessable by logged user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+    put:
+      tags:
+        - User
+      summary: Update a user
+      description: |
+        Only accessable by logged user
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be delete.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUser'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+        - User
+      summary: Delete a user
+      description: |
+        Only accessable by logged user
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'No Content'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /users/{userId}/password:
+    put:
+      tags:
+        - User
+      summary: Update a user password
+      description: |
+        Only accessable by logged user
+      operationId: updateUserPassword
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserPassword'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /users/{userId}/photo:
+    put:
+      tags:
+        - User
+      summary: Update a user photo
+      description: |
+        Only accessable by logged user
+      operationId: updateUserPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserPhoto'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Get all merchant products
+      operationId: getAllProducts
+      description: |
+        Only accessable by logged user and return the user's merchant products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductList'
+    post:
+      tags:
+        - Product
+      summary: Create new product
+      description: |
+        Only accessable by logged user
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateProduct'
+      responses:
+        '201':
+          $ref: '#/components/responses/Product'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /products/{productId}:
+    get:
+      tags:
+        - Product
+      summary: Get a product
+      operationId: getProduct
+      description: |
+        Only accessable by logged user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of product to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+    put:
+      tags:
+        - Product
+      summary: Update a product
+      description: |
+        Only accessable by logged user
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProduct'
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+        - Product
+      summary: Delete a product
+      description: |
+        Only accessable by logged product
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of product to be delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'No Content'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /products/{productId}/photo:
+    put:
+      tags:
+        - Product
+      summary: Update a product photo
+      description: |
+        Only accessable by logged user
+      operationId: updateProductPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          description: The ID of user to be updated.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProductPhoto'
+      responses:
+        '200':
+          $ref: '#/components/responses/Product'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 90
+        name:
+          type: string
+          example: 'Arda'
+        email:
+          type: string
+          example: 'arda@mail.com'
+        photo_url:
+          type: string
+          example: 'https://image.com/john-doe.jpg'
+        role:
+          type: string
+          enum: ['owner', 'manager', 'staff']
+          example: 'manager'
+        merchant_id:
+          type: integer
+          example: 2
+        created_at:
+          type: string
+          format: data
+        updated_at:
+          type: string
+          format: data
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 90
+        name:
+          type: string
+          example: 'Sepatu Hitam'
+        sku:
+          type: string
+          example: 'spt-htm'
+        photo_url:
+          type: string
+          example: 'https://image.com/spt-htm.jpg'
+        merchant_id:
+          type: integer
+          example: 2
+        created_at:
+          type: string
+          format: date
+        updated_at:
+          type: string
+          format: date
+  requestBodies:
+    Register:
+      description: Register user
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - email
+            - password
+            - password_confirmation
+            - business_name
+            - business_address
+            - business_phone
+            properties:
+              name:
+                type: string
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+              business_name:
+                type: string
+                example: 'Usaha Maju'
+              business_address:
+                type: string
+                example: 'Sesame Street, Malang'
+              business_phone:
+                type: string
+                example: '0341 467712'
+    Login:
+      description: Login User
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - email
+            - password
+            properties:
+              email:
+                type: string
+                example: 'user@mail.com'
+              password:
+                type: string
+                example: 'Secret123'
+    CreateUser:
+      description: new user data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - email
+            - role
+            - password
+            - password_confirmation
+            properties:
+              name:
+                type: string
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              role:
+                type: string
+                enum: [manager, staff]
+                example: manager
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+    UpdateUser:
+      description: update user data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - email
+            - role
+            properties:
+              name:
+                type: string
+                example: 'John Doe'
+              email:
+                type: string
+                example: 'user@mail.com'
+              role:
+                type: string
+                enum: [manager, staff]
+                example: manager
+    UpdateUserPassword:
+      description: change user password
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - password
+            - password_confirmation
+            properties:
+              password:
+                type: string
+                example: 'Secret123'
+              password_confirmation:
+                type: string
+                example: 'Secret123'
+    UpdateUserPhoto:
+      description: change user photo
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              photo:
+                type: string
+                format: binary
+    CreateProduct:
+      description: new product data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - sku
+            properties:
+              name:
+                type: string
+                example: 'Sepatu Hitam'
+              sku:
+                type: string
+                example: 'spt-htm'
+    UpdateProduct:
+      description: new product data
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - name
+            - sku
+            properties:
+              name:
+                type: string
+                example: 'Sepatu Hitam'
+              sku:
+                type: string
+                example: 'spt-htm'
+    UpdateProductPhoto:
+      description: change product photo
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              photo:
+                type: string
+                format: binary
+  responses:
+    ErrorBadRequest:
+      description: Bad request data.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Invalid data'
+    ErrorUnauthorized:
+      description: The Request is unautorized.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Data not found'
+    ErrorForbidden:
+      description: Forbidden.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Forbidden request'
+    ErrorNotFound:
+      description: Entity not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Data not found'
+    ErrorInternalServer:
+      description: Internal Error.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Internal server error'
+    Success:
+      description: Success message
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Success'
+    UserLogged:
+      description: User crendential and information
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/components/schemas/User'
+              token:
+                type: string
+    UserList:
+      description: List of users
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    User:
+      description: The user
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/components/schemas/User'
+    ProductList:
+      description: List of products
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    Product:
+      description: The product
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                $ref: '#/components/schemas/Product'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
